@@ -1,0 +1,337 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 50;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		225D727F221429A800372954 /* Rushton_Geometry_3d.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 225D727D221429A800372954 /* Rushton_Geometry_3d.cpp */; };
+		225D7282221445E000372954 /* create_rushton_point_cloud.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 225D7281221445E000372954 /* create_rushton_point_cloud.cpp */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		223BAE16220A127B009A7C3C /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		223BAE18220A127B009A7C3C /* TD_GeomInput_Rushton_Turbine */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = TD_GeomInput_Rushton_Turbine; sourceTree = BUILT_PRODUCTS_DIR; };
+		225A2299220A2B1500FDFB60 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		225A229A220A2B7400FDFB60 /* Rushton_Geometry_3d.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Rushton_Geometry_3d.hpp; sourceTree = "<group>"; };
+		225D727D221429A800372954 /* Rushton_Geometry_3d.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Rushton_Geometry_3d.cpp; sourceTree = "<group>"; };
+		225D727E221429A800372954 /* display_rushton_geometry.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = display_rushton_geometry.m; sourceTree = "<group>"; };
+		225D7281221445E000372954 /* create_rushton_point_cloud.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = create_rushton_point_cloud.cpp; sourceTree = "<group>"; };
+		225D7287221450C700372954 /* CMakeLists.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
+		225D7289221452C800372954 /* define_typealias.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = define_typealias.h; sourceTree = "<group>"; };
+		225D728A221452C800372954 /* CMakeLists.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
+		226D5175221460B2002F9B75 /* Inline.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Inline.hpp; sourceTree = "<group>"; };
+		226D5176221463F6002F9B75 /* define_datastructures.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = define_datastructures.hpp; sourceTree = "<group>"; };
+		226D51842216AB0E002F9B75 /* timer.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = timer.hpp; sourceTree = "<group>"; };
+		226D51852216AC61002F9B75 /* define_algo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = define_algo.h; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		223BAE15220A127B009A7C3C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		223BAE0F220A127B009A7C3C = {
+			isa = PBXGroup;
+			children = (
+				225A2299220A2B1500FDFB60 /* README.md */,
+				226D51832216A3B2002F9B75 /* local_include */,
+				223BAE1A220A127B009A7C3C /* rushton_turbine */,
+				223BAE19220A127B009A7C3C /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		223BAE19220A127B009A7C3C /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				223BAE18220A127B009A7C3C /* TD_GeomInput_Rushton_Turbine */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		223BAE1A220A127B009A7C3C /* rushton_turbine */ = {
+			isa = PBXGroup;
+			children = (
+				225D7288221450CE00372954 /* tests */,
+				225D728A221452C800372954 /* CMakeLists.txt */,
+				225D727E221429A800372954 /* display_rushton_geometry.m */,
+				225A229A220A2B7400FDFB60 /* Rushton_Geometry_3d.hpp */,
+				225D727D221429A800372954 /* Rushton_Geometry_3d.cpp */,
+				225D7281221445E000372954 /* create_rushton_point_cloud.cpp */,
+			);
+			path = rushton_turbine;
+			sourceTree = "<group>";
+		};
+		225D7288221450CE00372954 /* tests */ = {
+			isa = PBXGroup;
+			children = (
+				225D7287221450C700372954 /* CMakeLists.txt */,
+			);
+			path = tests;
+			sourceTree = "<group>";
+		};
+		226D51832216A3B2002F9B75 /* local_include */ = {
+			isa = PBXGroup;
+			children = (
+				225D7289221452C800372954 /* define_typealias.h */,
+				226D51852216AC61002F9B75 /* define_algo.h */,
+				226D5176221463F6002F9B75 /* define_datastructures.hpp */,
+				226D5175221460B2002F9B75 /* Inline.hpp */,
+				226D51842216AB0E002F9B75 /* timer.hpp */,
+			);
+			path = local_include;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		223BAE17220A127B009A7C3C /* TD_GeomInput_Rushton_Turbine */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 223BAE1F220A127B009A7C3C /* Build configuration list for PBXNativeTarget "TD_GeomInput_Rushton_Turbine" */;
+			buildPhases = (
+				223BAE14220A127B009A7C3C /* Sources */,
+				223BAE15220A127B009A7C3C /* Frameworks */,
+				223BAE16220A127B009A7C3C /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = TD_GeomInput_Rushton_Turbine;
+			productName = TD_GeomInput_Rushton_Turbine;
+			productReference = 223BAE18220A127B009A7C3C /* TD_GeomInput_Rushton_Turbine */;
+			productType = "com.apple.product-type.tool";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		223BAE10220A127B009A7C3C /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 1010;
+				ORGANIZATIONNAME = "Nile Ó Broin";
+				TargetAttributes = {
+					223BAE17220A127B009A7C3C = {
+						CreatedOnToolsVersion = 10.1;
+						LastSwiftMigration = 1010;
+					};
+				};
+			};
+			buildConfigurationList = 223BAE13220A127B009A7C3C /* Build configuration list for PBXProject "TD_GeomInput_Rushton_Turbine" */;
+			compatibilityVersion = "Xcode 9.3";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 223BAE0F220A127B009A7C3C;
+			productRefGroup = 223BAE19220A127B009A7C3C /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				223BAE17220A127B009A7C3C /* TD_GeomInput_Rushton_Turbine */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		223BAE14220A127B009A7C3C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				225D727F221429A800372954 /* Rushton_Geometry_3d.cpp in Sources */,
+				225D7282221445E000372954 /* create_rushton_point_cloud.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		223BAE1D220A127B009A7C3C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		223BAE1E220A127B009A7C3C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		223BAE20220A127B009A7C3C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "rushton_turbine/TD_GeomInput_Rushton_Turbine-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 4.2;
+			};
+			name = Debug;
+		};
+		223BAE21220A127B009A7C3C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "rushton_turbine/TD_GeomInput_Rushton_Turbine-Bridging-Header.h";
+				SWIFT_VERSION = 4.2;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		223BAE13220A127B009A7C3C /* Build configuration list for PBXProject "TD_GeomInput_Rushton_Turbine" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				223BAE1D220A127B009A7C3C /* Debug */,
+				223BAE1E220A127B009A7C3C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		223BAE1F220A127B009A7C3C /* Build configuration list for PBXNativeTarget "TD_GeomInput_Rushton_Turbine" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				223BAE20220A127B009A7C3C /* Debug */,
+				223BAE21220A127B009A7C3C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 223BAE10220A127B009A7C3C /* Project object */;
+}
