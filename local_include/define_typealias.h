@@ -2,8 +2,8 @@
 //  Header.h
 //  stirred-tank-3d-xcode-cpp
 //
-//  Created by Niall P. O'Byrnes on 16/22/11.
-//  Copyright © 2016 Niall P. O'Byrnes. All rights reserved.
+//  Created by Niall P. O'Byrnes on 2018/11/22.
+//  Copyright © 2018 Niall P. O'Byrnes. All rights reserved.
 //
 
 #ifndef define_typealias_h
@@ -34,8 +34,8 @@ typedef const float let_tGeomShape;
 typedef long int tGeomIndex;
 
 
-//The stepping vars
-typedef  int tStep;
+
+typedef int tStep;
 
 
 

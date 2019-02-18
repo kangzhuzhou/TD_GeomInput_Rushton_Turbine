@@ -3,8 +3,8 @@
 //  define_datastructures.h
 //  stirred-tank-3d-xcode-cpp
 //
-//  Created by Niall P. O'Byrnes on 16/22/11.
-//  Copyright © 2016 Niall P. O'Byrnes. All rights reserved.
+//  Created by Niall P. O'Byrnes on 18/22/11.
+//  Copyright © 2018 Niall P. O'Byrnes. All rights reserved.
 //
 
 #include <stdio.h>
@@ -21,6 +21,7 @@
 
 
 #include "Rushton_Geometry_3d.hpp"
+#include "Rushton_Geometry_Config.hpp"
 
 
 
@@ -52,22 +53,26 @@ int main(){
     
 
 
-    GeometryStartup geomStartup;
-    geomStartup.step = 0;
-    geomStartup.impeller_start_angle = 0.0f;
-    geomStartup.impeller_slow_step_limit = 0;
+    tStep starting_step = 0;
+    tGeomShape impeller_start_angle = 0.0;
+    tStep impeller_startup_steps_until_normal_speed = 0;
     
 
 
     tGeomShape uav = 0.1;
     GeometryConfig tankConfig;
+
+
     tankConfig.setGeometryConfig(grid.x, uav);
-    
-    
+    tankConfig.setGeometryStartup(starting_step, impeller_start_angle, impeller_startup_steps_until_normal_speed);
+
+
+    tankConfig.saveGeometryConfigAsJSON("tankConfig.json");
+    tankConfig.loadGeometryConfigAsJSON("tankConfig.json");
 
     
     Geometry geometry;
-    geometry.Init(geomStartup, grid, node, tankConfig);
+    geometry.Init(grid, node, tankConfig);
     
     
     
@@ -76,7 +81,6 @@ int main(){
 
     geometry.print_geometry_points_csv("tank_geometry.csv", geometry.geom_fixed_solid, "append");
     geometry.print_geometry_points_csv("tank_geometry.csv", geometry.geom_rotating_solid, "append");
-
 
 
 

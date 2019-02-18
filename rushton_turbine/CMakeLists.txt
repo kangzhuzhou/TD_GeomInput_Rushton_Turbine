@@ -51,14 +51,14 @@ include_directories("../../include")
 include_directories("../local_include")
 
 
-add_executable(td_rushton_test create_rushton_point_cloud.cpp Rushton_Geometry_3d.cpp)
+add_executable(td_rushton_test create_rushton_point_cloud.cpp Rushton_Geometry_3d.cpp Rushton_Geometry_Config.cpp)
 
 target_link_libraries(td_rushton_test ${MPI_LIBRARIES} ${Boost_LIBRARIES})
 
 target_compile_definitions(td_rushton_test PRIVATE -DWITH_MPI=0)
 
 
-add_library(LIB_RUSHTON STATIC Rushton_Geometry_3d.cpp)
+add_library(LIB_RUSHTON STATIC Rushton_Geometry_3d.cpp Rushton_Geometry_Config.cpp)
 
 
 
@@ -70,5 +70,5 @@ option(ENABLE_TESTS "Build and install tests (default OFF)" OFF)
 
 if(ENABLE_TESTS)
     enable_testing()
-#    add_subdirectory("${CMAKE_SOURCE_DIR}/tests")
+    add_subdirectory("${CMAKE_SOURCE_DIR}/tests")
 endif()

@@ -6,14 +6,18 @@
 //  Copyright © 2019 Nile Ó Broin. All rights reserved.
 //
 
+#include <stdio.h>
+#include <stdlib.h>
+
 #include <vector>
 #include <fstream>
 #include <sstream>
-#include <limits>
+#include <iostream>
 #include <boost/property_tree/json_parser.hpp>
 
 
 #include "Rushton_Geometry_3d.hpp"
+#include "Rushton_Geometry_Config.hpp"
 
 
 
@@ -28,122 +32,10 @@ Float3D center;
 
 
 
-void Geometry::print_geometry_points_csv(const std::string &filename, const std::vector<GeomData> &geom, const std::string append)
-{
-
-    std::ofstream csvFile(filename, append=="append" ? std::ofstream::app : std::ofstream::out);
-
-    csvFile.precision(std::numeric_limits<float>::max_digits10);
-
-
-
-    for(auto &g: geom)
-    {
-        csvFile <<
-
-        g.i_cart << " " <<
-        g.j_cart << " " <<
-        g.k_cart << " " <<
-
-        g.is_solid << " " <<
-        std::endl;
-    }
-    csvFile.close();
-}
-
-
-
-
-
-void Geometry::print_geometry_csv(const std::string &filename, const std::vector<GeomData> &geom, const std::string append)
-{
-
-    std::ofstream csvFile(filename, append=="append" ? std::ofstream::app : std::ofstream::out);
-
-    csvFile.precision(std::numeric_limits<float>::max_digits10);
-
-
-
-    for(auto &g: geom)
-    {
-        csvFile <<
-        g.resolution << " " <<
-
-        g.r_polar << " " <<
-        g.t_polar << " " <<
-
-        g.i_cart_fp << " " <<
-        g.j_cart_fp << " " <<
-        g.k_cart_fp << " " <<
-
-        g.u_delta_fp << " " <<
-        g.v_delta_fp << " " <<
-        g.w_delta_fp << " " <<
-
-        g.i_cart << " " << //10:int
-        g.i_cart_fraction << " " <<
-        g.j_cart << " " << //11:int
-        g.j_cart_fraction << " " <<
-        g.k_cart << " " << //12:int
-        g.k_cart_fraction << " " <<
-
-        g.is_solid << " " <<
-        std::endl;
-    }
-    csvFile.close();
-}
-
-
-
-//    Warning: Makes un-checked assumptions on dimensions of the
-//    data. Do not use for other than particular job.
-std::vector<GeomData> Geometry::load_geom_data_from_csv(const std::string &srcFile)
-{
-    std::ifstream csvFile(srcFile);
-    if(!csvFile.is_open())
-        throw std::string("Could not open source csv file."); // Roll onto our backs.
-
-    std::vector<GeomData> result;
-    for(std::string line; std::getline(csvFile, line); )
-    {
-        std::stringstream lineStream(line);
-        GeomData entry;
-
-        lineStream
-        >> entry.resolution
-
-        >> entry.r_polar
-        >> entry.t_polar
-
-        >> entry.i_cart_fp
-        >> entry.j_cart_fp
-        >> entry.k_cart_fp
-
-        >> entry.u_delta_fp
-        >> entry.v_delta_fp
-        >> entry.w_delta_fp
-
-        >> entry.i_cart // int
-        >> entry.i_cart_fraction
-        >> entry.j_cart //int
-        >> entry.j_cart_fraction
-        >> entry.k_cart //int
-        >> entry.k_cart_fraction
-
-        >> entry.is_solid;
-
-        result.push_back(entry);
-    }
-    return result;
-}
-
-
-
 void inline Geometry::UpdateCoordinateFraction(tGeomShape coordinate, tNi *integerPart, tGeomShape *fractionPart)
 {
     *integerPart = tNi(roundf(coordinate + 0.5f));
     *fractionPart = coordinate - (tGeomShape)(*integerPart) - 0.5f;
-
 }
 
 
@@ -197,7 +89,6 @@ std::vector<GeomData> Geometry::CreateTankWall(tNi lowerLimitX, tNi upperLimitX,
                 if (get_solid == 0 && g.is_solid == 0) result.push_back(g);
 
 
-                
             }
             
         }
@@ -304,8 +195,8 @@ std::vector<GeomData> Geometry::CreateImpellerBlades(tStep step, tNi lowerLimitX
 
 
     tGeomShape wa;
-    if (step < geomStartup.impeller_slow_step_limit)
-        wa = 0.5f * tankConfig.impellers.w0 * (1.0f - cosf(M_PI * (step) / ((float)geomStartup.impeller_slow_step_limit)));
+    if (step < tankConfig.impeller_startup_steps_until_normal_speed)
+        wa = 0.5f * tankConfig.impellers.w0 * (1.0f - cosf(M_PI * (step) / ((float)tankConfig.impeller_startup_steps_until_normal_speed)));
     else
         wa = tankConfig.wa;
     
@@ -561,10 +452,6 @@ std::vector<GeomData> Geometry::CreateImpellerShaft(tNi lowerLimitX, tNi upperLi
     tNi hubBottom = tNi(roundf(tankConfig.hub.bottom));
     tNi hubTop = tNi(roundf(tankConfig.hub.top));
 
-    // Refactoring artifact for keeping the exact same model boundaries.
-//    lowerLimitX++;
-//    upperLimitX++;
-
     std::vector<GeomData> result;
     for (tNi x = lowerLimitX; x <= upperLimitX; ++x)
     {
@@ -653,80 +540,11 @@ std::vector<GeomData> Geometry::CreateImpellerShaft(tNi lowerLimitX, tNi upperLi
 
 
 
-void GeometryConfig::setGeometryConfig(tNi snx, tGeomShape _uav)
-{
-    resolution = 0.7f;
-    uav = _uav;
-    
-    tankDiameter = tGeomShape(snx - MDIAM_BORDER); //diameter tube / cylinder
-
-
-    baffles.num_baffles = 4;
-
-    //First baffle is offset by 1/8 of revolution, or 1/2 of the delta between baffles.
-    baffles.firstBaffleOffset = (tGeomShape)(((2.0 * M_PI) / (double)baffles.num_baffles) * 0.5);
-
-
-    baffles.innerRadius = 0.3830f * tankDiameter;
-    baffles.outerRadius = 0.4830f * tankDiameter;
-    baffles.thickness = tankDiameter / 75.0f;
-
-
-    impellers.num_impellers = 6;
-
-    impellers.theta = 0.0f;
-    impellers.innerRadius = tankDiameter / 12.0f;
-    impellers.outerRadius = tankDiameter / 6.0f;
-    impellers.bottom = tankDiameter * 9.0f / 30.f;// bottom height impeller blade
-    impellers.top = tankDiameter * 11.0f / 30.f;  // top height impeller blade
-    impellers.bladeThickness = tankDiameter / 75.0f;
-
-    // Eventual angular velocity impeller
-    impellers.w0 = uav / impellers.outerRadius;
-
-
-    disk.radius = tankDiameter / 8.0f;
-    disk.bottom = tankDiameter * 49.0f / 150.0f;
-    disk.top = tankDiameter * 51.0f / 150.0f;
-
-    hub.radius = tankDiameter * 4.0f / 75.0f;
-    hub.bottom = tankDiameter * 9.0f / 30.0f;
-    hub.top = tankDiameter * 11.f / 30.0f;
-
-    shaftRadius = tankDiameter * 2.0f / 75.0f;
-
-    
-};
-
-void GeometryConfig::saveGeometryConfigAsJSON(std::string filepath){
-
-    try
-    {
-//        boost::property_tree::ptree jsontree;
-//        jsontree.put<std::string>("name", "GeometryConfig");
-//
-//        jsontree.put<tGeomShape>("uav", uav);
-//
-//        boost::property_tree::write_json(filepath.c_str(), jsontree);
-//        return 0;
-    }
-    catch(std::exception& e)
-    {
-//        std::cerr << "Unhandled Exception reached parsing arguments: "
-//        << e.what() << ", application will now exit" << std::endl;
-    }
-}
 
 
 
-void GeometryConfig::loadGeometryConfigAsJSON(std::string filepath){
 
-
-}
-
-
-
-void Geometry::Init(GeometryStartup gStart, Grid_Dims _grid, Node_Dims _node, GeometryConfig _tankConfig)
+void Geometry::Init(Grid_Dims _grid, Node_Dims _node, GeometryConfig _tankConfig)
 {
     geom_fixed.clear();
     geom_rotating.clear();
@@ -734,8 +552,6 @@ void Geometry::Init(GeometryStartup gStart, Grid_Dims _grid, Node_Dims _node, Ge
     geom_fixed_solid.clear();
     geom_rotating_solid.clear();
 
-
-    geomStartup = gStart;
 
     grid = _grid;
     node = _node;
@@ -748,9 +564,6 @@ void Geometry::Init(GeometryStartup gStart, Grid_Dims _grid, Node_Dims _node, Ge
 
     if (node.idi == 0) lowerLimitX = 1;
     if (node.idi == grid.ngx - 1) upperLimitX -= 1;
-
-    //    tNi lowerLimitX = node.idx * simulationCfg.gridSize.x;
-    //    tNi upperLimitX = lowerLimitX + simulationCfg.gridSize.x;
 
 
     center.x = tGeomShape(grid.x) / 3.0f; //center x direction
@@ -769,7 +582,7 @@ void Geometry::Init(GeometryStartup gStart, Grid_Dims _grid, Node_Dims _node, Ge
 
 
     // impeller blades
-    std::vector<GeomData> impellerBladesGeometry = CreateImpellerBlades(geomStartup.step, lowerLimitX, upperLimitX);
+    std::vector<GeomData> impellerBladesGeometry = CreateImpellerBlades(tankConfig.starting_step, lowerLimitX, upperLimitX);
     geom_rotating.insert(geom_rotating.end(), impellerBladesGeometry.begin(), impellerBladesGeometry.end());
 
     //impeller disk
@@ -803,7 +616,7 @@ void Geometry::Init(GeometryStartup gStart, Grid_Dims _grid, Node_Dims _node, Ge
 
     //ONLY THE BLADE SOLID ELEMENTS ARE ROTATING
     // impeller blades
-    std::vector<GeomData> impellerBladesGeometry_solid = CreateImpellerBlades(geomStartup.step, lowerLimitX, upperLimitX, get_solid);
+    std::vector<GeomData> impellerBladesGeometry_solid = CreateImpellerBlades(tankConfig.starting_step, lowerLimitX, upperLimitX, get_solid);
     geom_rotating_solid.insert(geom_rotating_solid.end(), impellerBladesGeometry_solid.begin(), impellerBladesGeometry_solid.end());
 
 
@@ -827,36 +640,18 @@ void Geometry::Init(GeometryStartup gStart, Grid_Dims _grid, Node_Dims _node, Ge
 
 
 
-Geom_Dims Geometry::get_geom_dims(){
-
-    Geom_Dims gdata;
-    gdata.xc = center.x;
-    gdata.yc = center.y;
-    gdata.zc = center.z;
 
 
-    gdata.mdiam = tankConfig.tankDiameter;
+tGeomShape Geometry::calc_this_step_impeller_increment(tStep step)
+{
 
-    gdata.impeller_increment = tankConfig.impellers.w0;
-
-    return gdata;
-}
-
-
-
-
-
-
-tGeomShape Geometry::calc_this_step_impeller_increment(tStep step) {
     tGeomShape this_step_impeller_increment_wa = tankConfig.impellers.w0;
 
 
-
-
     //slowly start the impeller
-    if (step < geomStartup.impeller_slow_step_limit) {
+    if (step < tankConfig.impeller_startup_steps_until_normal_speed) {
 
-        this_step_impeller_increment_wa = 0.5 * tankConfig.impellers.w0 * (1.0 - cosf(M_PI * (tGeomShape)step / ((tGeomShape)geomStartup.impeller_slow_step_limit)));
+        this_step_impeller_increment_wa = 0.5 * tankConfig.impellers.w0 * (1.0 - cosf(M_PI * (tGeomShape)step / ((tGeomShape)tankConfig.impeller_startup_steps_until_normal_speed)));
 
     }
     return this_step_impeller_increment_wa;
@@ -923,18 +718,134 @@ tGeomShape Geometry::Update(Multi_Timer &timer, tStep step, tGeomShape impellerT
 
 
 
+Geom_Dims Geometry::get_geom_dims(){
+
+    Geom_Dims gdata;
+    gdata.xc = center.x;
+    gdata.yc = center.y;
+    gdata.zc = center.z;
 
 
+    gdata.mdiam = tankConfig.tankDiameter;
 
+    gdata.impeller_increment = tankConfig.impellers.w0;
 
-
-void Geometry::clear_vectors(){
-
-    geom_fixed.clear();
-    geom_fixed_solid.clear();
-
-
-    geom_rotating.clear();
-    geom_rotating_solid.clear();
+    return gdata;
 }
+
+
+
+
+
+
+void Geometry::print_geometry_points_csv(const std::string &filename, const std::vector<GeomData> &geom, const std::string append)
+{
+
+    std::ofstream csvFile(filename, append=="append" ? std::ofstream::app : std::ofstream::out);
+
+    csvFile.precision(std::numeric_limits<float>::max_digits10);
+
+
+
+    for(auto &g: geom)
+    {
+        csvFile <<
+
+        g.i_cart << " " <<
+        g.j_cart << " " <<
+        g.k_cart << " " <<
+
+        g.is_solid << " " <<
+        std::endl;
+    }
+    csvFile.close();
+}
+
+
+
+
+
+void Geometry::print_geometry_csv(const std::string &filename, const std::vector<GeomData> &geom, const std::string append)
+{
+
+    std::ofstream csvFile(filename, append=="append" ? std::ofstream::app : std::ofstream::out);
+
+    csvFile.precision(std::numeric_limits<float>::max_digits10);
+
+
+
+    for(auto &g: geom)
+    {
+        csvFile <<
+        g.resolution << " " <<
+
+        g.r_polar << " " <<
+        g.t_polar << " " <<
+
+        g.i_cart_fp << " " <<
+        g.j_cart_fp << " " <<
+        g.k_cart_fp << " " <<
+
+        g.u_delta_fp << " " <<
+        g.v_delta_fp << " " <<
+        g.w_delta_fp << " " <<
+
+        g.i_cart << " " <<
+        g.i_cart_fraction << " " <<
+        g.j_cart << " " <<
+        g.j_cart_fraction << " " <<
+        g.k_cart << " " <<
+        g.k_cart_fraction << " " <<
+
+        g.is_solid << " " <<
+        std::endl;
+    }
+    csvFile.close();
+}
+
+
+
+//    Warning: Makes un-checked assumptions on dimensions of the
+//    data. Do not use for other than particular job.
+std::vector<GeomData> Geometry::load_geom_data_from_csv(const std::string &srcFile)
+{
+    std::ifstream csvFile(srcFile);
+    if(!csvFile.is_open())
+        throw std::string("Could not open source csv file.");
+
+    std::vector<GeomData> result;
+    for(std::string line; std::getline(csvFile, line); )
+    {
+        std::stringstream lineStream(line);
+        GeomData entry;
+
+        lineStream
+        >> entry.resolution
+
+        >> entry.r_polar
+        >> entry.t_polar
+
+        >> entry.i_cart_fp
+        >> entry.j_cart_fp
+        >> entry.k_cart_fp
+
+        >> entry.u_delta_fp
+        >> entry.v_delta_fp
+        >> entry.w_delta_fp
+
+        >> entry.i_cart
+        >> entry.i_cart_fraction
+        >> entry.j_cart
+        >> entry.j_cart_fraction
+        >> entry.k_cart
+        >> entry.k_cart_fraction
+
+        >> entry.is_solid;
+
+        result.push_back(entry);
+    }
+    return result;
+}
+
+
 

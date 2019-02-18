@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		225D727F221429A800372954 /* Rushton_Geometry_3d.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 225D727D221429A800372954 /* Rushton_Geometry_3d.cpp */; };
 		225D7282221445E000372954 /* create_rushton_point_cloud.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 225D7281221445E000372954 /* create_rushton_point_cloud.cpp */; };
+		227431022218C0920027C908 /* Rushton_Geometry_Config.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 227431012218C0920027C908 /* Rushton_Geometry_Config.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -36,7 +37,8 @@
 		226D5175221460B2002F9B75 /* Inline.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Inline.hpp; sourceTree = "<group>"; };
 		226D5176221463F6002F9B75 /* define_datastructures.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = define_datastructures.hpp; sourceTree = "<group>"; };
 		226D51842216AB0E002F9B75 /* timer.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = timer.hpp; sourceTree = "<group>"; };
-		226D51852216AC61002F9B75 /* define_algo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = define_algo.h; sourceTree = "<group>"; };
+		227431002218C0800027C908 /* Rushton_Geometry_Config.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Rushton_Geometry_Config.hpp; sourceTree = "<group>"; };
+		227431012218C0920027C908 /* Rushton_Geometry_Config.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Rushton_Geometry_Config.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -74,6 +76,8 @@
 				225D7288221450CE00372954 /* tests */,
 				225D728A221452C800372954 /* CMakeLists.txt */,
 				225D727E221429A800372954 /* display_rushton_geometry.m */,
+				227431002218C0800027C908 /* Rushton_Geometry_Config.hpp */,
+				227431012218C0920027C908 /* Rushton_Geometry_Config.cpp */,
 				225A229A220A2B7400FDFB60 /* Rushton_Geometry_3d.hpp */,
 				225D727D221429A800372954 /* Rushton_Geometry_3d.cpp */,
 				225D7281221445E000372954 /* create_rushton_point_cloud.cpp */,
@@ -93,7 +97,6 @@
 			isa = PBXGroup;
 			children = (
 				225D7289221452C800372954 /* define_typealias.h */,
-				226D51852216AC61002F9B75 /* define_algo.h */,
 				226D5176221463F6002F9B75 /* define_datastructures.hpp */,
 				226D5175221460B2002F9B75 /* Inline.hpp */,
 				226D51842216AB0E002F9B75 /* timer.hpp */,
@@ -159,6 +162,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				225D727F221429A800372954 /* Rushton_Geometry_3d.cpp in Sources */,
+				227431022218C0920027C908 /* Rushton_Geometry_Config.cpp in Sources */,
 				225D7282221445E000372954 /* create_rushton_point_cloud.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -217,6 +221,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = "/Users/nile/spack/opt/spack/darwin-mojave-x86_64/gcc-8.2.0/boost-1.68.0-ut63j5tdsl5n546bogscvgsvpoy56eno/include";
 				MACOSX_DEPLOYMENT_TARGET = 10.14;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -270,6 +275,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = "/Users/nile/spack/opt/spack/darwin-mojave-x86_64/gcc-8.2.0/boost-1.68.0-ut63j5tdsl5n546bogscvgsvpoy56eno/include";
 				MACOSX_DEPLOYMENT_TARGET = 10.14;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
