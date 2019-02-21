@@ -359,11 +359,10 @@ std::vector<GeomData> Geometry::CreateHub(tNi lowerLimitX, tNi upperLimitX, bool
 
     tNi bottom = tNi(roundf(tankConfig.impeller.hub.bottom));
     tNi top = tNi(roundf(tankConfig.impeller.hub.top));
-    tGeomShape shaftRadius = tankConfig.shaftRadius;
     tGeomShape hubRadius = tankConfig.impeller.hub.radius;
 
-    tNi nPointsR = tNi(roundf((hubRadius - shaftRadius) / tankConfig.resolution));
-    tGeomShape resolutionR = (hubRadius - shaftRadius) / tGeomShape(nPointsR);
+    tNi nPointsR = tNi(roundf((hubRadius - tankConfig.shaft.radius) / tankConfig.resolution));
+    tGeomShape resolutionR = (hubRadius - tankConfig.shaft.radius) / tGeomShape(nPointsR);
 
     lowerLimitX = std::max(lowerLimitX, bottom);
     upperLimitX = std::min(upperLimitX, top);
@@ -376,7 +375,7 @@ std::vector<GeomData> Geometry::CreateHub(tNi lowerLimitX, tNi upperLimitX, bool
 
         for (tNi idxR = 1; idxR <= nPointsR; ++idxR)
         {
-            tGeomShape r = shaftRadius + idxR * resolutionR;
+            tGeomShape r = tankConfig.shaft.radius + idxR * resolutionR;
             tNi nPointsTheta = tNi(roundf(2 * M_PI * r / tankConfig.resolution));
             tGeomShape dTheta;
             if(nPointsTheta == 0)
@@ -458,7 +457,7 @@ std::vector<GeomData> Geometry::CreateImpellerShaft(tNi lowerLimitX, tNi upperLi
         bool isWithinHub = x >= hubBottom && x <= hubTop;
 
 
-        tGeomShape rEnd = tankConfig.shaftRadius; // isWithinHub ? modelConfig.hub.radius : modelConfig.shaftRadius;
+        tGeomShape rEnd = tankConfig.shaft.radius; // isWithinHub ? modelConfig.hub.radius : modelConfig.shaft.radius;
         tNi nPointsR = roundf(rEnd / tankConfig.resolution);
 
         for(tNi idxR = 0; idxR <= nPointsR; ++idxR)

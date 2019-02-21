@@ -28,7 +28,7 @@ void GeometryConfig::setGeometryConfig(tNi snx, tGeomShape _uav)
     //diameter tube / cylinder
     tankDiameter = tGeomShape(snx - MDIAM_BORDER);
 
-    shaftRadius = tankDiameter * 2.0f / 75.0f;
+    shaft.radius = tankDiameter * 2.0f / 75.0f;
 
 
 
@@ -102,7 +102,6 @@ int GeometryConfig::saveGeometryConfigAsJSON(std::string filepath){
 
         jsontree.put<tGeomShape>("resolution", resolution);
         jsontree.put<tGeomShape>("tankDiameter", tankDiameter);
-        jsontree.put<tGeomShape>("shaftRadius", shaftRadius);
 
         
         jsontree.put<tStep>("starting_step", starting_step);
@@ -158,6 +157,12 @@ int GeometryConfig::saveGeometryConfigAsJSON(std::string filepath){
 
 
 
+        boost::property_tree::ptree shaft_json;
+        shaft_json.put<tGeomShape>("radius", shaft.radius);
+        jsontree.put_child("shaft", shaft_json);
+
+
+
 
         boost::property_tree::write_json(filepath.c_str(), jsontree);
         return 0;
@@ -190,7 +195,7 @@ void GeometryConfig::loadGeometryConfigAsJSON(std::string filepath){
         uav = jsontree.get<tGeomShape>("uav", 0);
         resolution = jsontree.get<tGeomShape>("resolution", 0);
         tankDiameter = jsontree.get<tGeomShape>("tankDiameter", 0);
-        shaftRadius = jsontree.get<tGeomShape>("shaftRadius", 0);
+
 
         starting_step = jsontree.get<tStep>("starting_step", 0);
         impeller_start_angle = jsontree.get<tGeomShape>("impeller_start_angle", 0);
@@ -230,6 +235,13 @@ void GeometryConfig::loadGeometryConfigAsJSON(std::string filepath){
         impeller.hub.radius = hub_json.get<tGeomShape>("radius", 0);
         impeller.hub.bottom = hub_json.get<tGeomShape>("bottom", 0);
         impeller.hub.top = hub_json.get<tGeomShape>("top", 0);
+
+
+
+
+        boost::property_tree::ptree shaft_json = jsontree.get_child("shaft");
+        shaft.radius = shaft_json.get<tGeomShape>("radius", 0);
+
 
 
     }

@@ -62,6 +62,16 @@ struct Impeller
 };
 
 
+struct Shaft
+{
+    tGeomShape radius = 0.0;
+    tGeomShape bottom = 0.0;
+    tGeomShape top = 0.0;
+};
+
+
+
+
 
 class GeometryConfig
 {
@@ -91,13 +101,13 @@ public:
     // Model resolution
     tGeomShape resolution = 0.0;
     tGeomShape tankDiameter = 0.0;
-    tGeomShape shaftRadius = 0.0f;
 
     Baffles baffles;
 
     int num_impellers;
     Impeller impeller;
 
+    Shaft shaft;
 
 };
 
