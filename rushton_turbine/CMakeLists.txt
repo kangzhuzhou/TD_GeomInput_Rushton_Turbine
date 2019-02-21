@@ -47,8 +47,8 @@ endif()
 
 
 include_directories("${CMAKE_SOURCE_DIR}")
-include_directories("../../include")
 include_directories("../local_include")
+#include_directories("../../include")
 
 
 add_executable(td_rushton_test create_rushton_point_cloud.cpp Rushton_Geometry_3d.cpp Rushton_Geometry_Config.cpp)

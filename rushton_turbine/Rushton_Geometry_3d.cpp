@@ -171,39 +171,39 @@ std::vector<GeomData> Geometry::CreateBaffles(tNi lowerLimitX, tNi upperLimitX, 
 
 std::vector<GeomData> Geometry::CreateImpellerBlades(tStep step, tNi lowerLimitX, tNi upperLimitX, bool get_solid = 0)
 {
-    double innerRadius = tankConfig.impellers.innerRadius;
-    double outerRadius = tankConfig.impellers.outerRadius;
-    tNi discBottom = tNi(roundf(tankConfig.disk.bottom));
-    tNi discTop = tNi(roundf(tankConfig.disk.top));
-    tNi impellerBottom = tNi(roundf(tankConfig.impellers.bottom));
-    tNi impellerTop = tNi(roundf(tankConfig.impellers.top));
+    double innerRadius = tankConfig.impeller.blades.innerRadius;
+    double outerRadius = tankConfig.impeller.blades.outerRadius;
+    tNi discBottom = tNi(roundf(tankConfig.impeller.disk.bottom));
+    tNi discTop = tNi(roundf(tankConfig.impeller.disk.top));
+    tNi impellerBottom = tNi(roundf(tankConfig.impeller.blades.bottom));
+    tNi impellerTop = tNi(roundf(tankConfig.impeller.blades.top));
     
     lowerLimitX = std::max(lowerLimitX, impellerBottom);
     upperLimitX = std::min(upperLimitX, impellerTop);
     
     tGeomShape nPointsR = tNi(roundf((outerRadius - innerRadius) / tankConfig.resolution));
-    tGeomShape nPointsThickness = tNi(roundf(tankConfig.impellers.bladeThickness / tankConfig.resolution));
+    tGeomShape nPointsThickness = tNi(roundf(tankConfig.impeller.blades.bladeThickness / tankConfig.resolution));
     if (nPointsThickness == 0)
         nPointsThickness = 1;
     
-    tGeomShape resolutionBladeThickness = tankConfig.impellers.bladeThickness / tGeomShape(nPointsThickness);
+    tGeomShape resolutionBladeThickness = tankConfig.impeller.blades.bladeThickness / tGeomShape(nPointsThickness);
     double deltaR = (outerRadius - innerRadius) / nPointsR;
 
 
-    double deltaTheta = 2.0/(double)tankConfig.impellers.num_impellers * M_PI;
+    double deltaTheta = 2.0/(double)tankConfig.impeller.blades.num_blades * M_PI;
 
 
 
     tGeomShape wa;
     if (step < tankConfig.impeller_startup_steps_until_normal_speed)
-        wa = 0.5f * tankConfig.impellers.w0 * (1.0f - cosf(M_PI * (step) / ((float)tankConfig.impeller_startup_steps_until_normal_speed)));
+        wa = 0.5f * tankConfig.impeller.blades.w0 * (1.0f - cosf(M_PI * (step) / ((float)tankConfig.impeller_startup_steps_until_normal_speed)));
     else
         wa = tankConfig.wa;
     
     
     
     std::vector<GeomData> result;
-    for (tNi nBlade = 1; nBlade <= tankConfig.impellers.num_impellers; ++nBlade)
+    for (tNi nBlade = 1; nBlade <= tankConfig.impeller.blades.num_blades; ++nBlade)
     {
         for (tNi x = lowerLimitX; x <= upperLimitX; ++x)
         {
@@ -213,10 +213,10 @@ std::vector<GeomData> Geometry::CreateImpellerBlades(tStep step, tNi lowerLimitX
                 for (tNi idxThickness = 0; idxThickness <= nPointsThickness; ++idxThickness)
                 {
                     tGeomShape theta = deltaTheta * nBlade +
-                    tankConfig.impellers.theta +
+                    tankConfig.impeller.blades.theta +
                     (idxThickness - nPointsThickness / 2.0f) * resolutionBladeThickness / r;
                     
-                    bool insideDisc = (r <= tankConfig.disk.radius) && (x >= discBottom) && (x <= discTop);
+                    bool insideDisc = (r <= tankConfig.impeller.disk.radius) && (x >= discBottom) && (x <= discTop);
                     if(insideDisc)
                         continue;
                     
@@ -264,10 +264,10 @@ std::vector<GeomData> Geometry::CreateImpellerBlades(tStep step, tNi lowerLimitX
 
 std::vector<GeomData> Geometry::CreateImpellerDisk(tNi lowerLimitX, tNi upperLimitX, bool get_solid = 0)
 {
-    tNi bottom = tNi(roundf(tankConfig.disk.bottom));
-    tNi top = tNi(roundf(tankConfig.disk.top));
-    tGeomShape hubRadius = tankConfig.hub.radius;
-    tGeomShape diskRadius = tankConfig.disk.radius;
+    tNi bottom = tNi(roundf(tankConfig.impeller.disk.bottom));
+    tNi top = tNi(roundf(tankConfig.impeller.disk.top));
+    tGeomShape hubRadius = tankConfig.impeller.hub.radius;
+    tGeomShape diskRadius = tankConfig.impeller.disk.radius;
 
     tNi nPointsR = tNi(round((diskRadius - hubRadius) / tankConfig.resolution));
     tGeomShape deltaR = (diskRadius - hubRadius) / tGeomShape(nPointsR);
@@ -291,7 +291,7 @@ std::vector<GeomData> Geometry::CreateImpellerDisk(tNi lowerLimitX, tNi upperLim
             else
                 dTheta = 2 * M_PI / nPointsTheta;
 
-            tGeomShape theta0 = tankConfig.impellers.theta;
+            tGeomShape theta0 = tankConfig.impeller.blades.theta;
             if ((idxR & 1) == 0)
                 theta0 += 0.5f * dTheta;
             if ((x & 1) == 0)
@@ -352,15 +352,15 @@ std::vector<GeomData> Geometry::CreateImpellerDisk(tNi lowerLimitX, tNi upperLim
 std::vector<GeomData> Geometry::CreateHub(tNi lowerLimitX, tNi upperLimitX, bool get_solid = 0)
 {
 
-    tNi diskBottom = tNi(roundf(tankConfig.disk.bottom));
-    tNi diskTop = tNi(roundf(tankConfig.disk.top));
+    tNi diskBottom = tNi(roundf(tankConfig.impeller.disk.bottom));
+    tNi diskTop = tNi(roundf(tankConfig.impeller.disk.top));
 
 
 
-    tNi bottom = tNi(roundf(tankConfig.hub.bottom));
-    tNi top = tNi(roundf(tankConfig.hub.top));
+    tNi bottom = tNi(roundf(tankConfig.impeller.hub.bottom));
+    tNi top = tNi(roundf(tankConfig.impeller.hub.top));
     tGeomShape shaftRadius = tankConfig.shaftRadius;
-    tGeomShape hubRadius = tankConfig.hub.radius;
+    tGeomShape hubRadius = tankConfig.impeller.hub.radius;
 
     tNi nPointsR = tNi(roundf((hubRadius - shaftRadius) / tankConfig.resolution));
     tGeomShape resolutionR = (hubRadius - shaftRadius) / tGeomShape(nPointsR);
@@ -387,7 +387,7 @@ std::vector<GeomData> Geometry::CreateHub(tNi lowerLimitX, tNi upperLimitX, bool
             else
                 dTheta = 2 * M_PI / nPointsTheta;
 
-            tGeomShape theta0 = tankConfig.impellers.theta;
+            tGeomShape theta0 = tankConfig.impeller.blades.theta;
             if ((idxR & 1) == 0)
                 theta0 += 0.5f * dTheta;
             if ((x & 1) == 0)
@@ -449,8 +449,8 @@ std::vector<GeomData> Geometry::CreateHub(tNi lowerLimitX, tNi upperLimitX, bool
 
 std::vector<GeomData> Geometry::CreateImpellerShaft(tNi lowerLimitX, tNi upperLimitX, bool get_solid = 0)
 {
-    tNi hubBottom = tNi(roundf(tankConfig.hub.bottom));
-    tNi hubTop = tNi(roundf(tankConfig.hub.top));
+    tNi hubBottom = tNi(roundf(tankConfig.impeller.hub.bottom));
+    tNi hubTop = tNi(roundf(tankConfig.impeller.hub.top));
 
     std::vector<GeomData> result;
     for (tNi x = lowerLimitX; x <= upperLimitX; ++x)
@@ -645,13 +645,13 @@ void Geometry::Init(Grid_Dims _grid, Node_Dims _node, GeometryConfig _tankConfig
 tGeomShape Geometry::calc_this_step_impeller_increment(tStep step)
 {
 
-    tGeomShape this_step_impeller_increment_wa = tankConfig.impellers.w0;
+    tGeomShape this_step_impeller_increment_wa = tankConfig.impeller.blades.w0;
 
 
     //slowly start the impeller
     if (step < tankConfig.impeller_startup_steps_until_normal_speed) {
 
-        this_step_impeller_increment_wa = 0.5 * tankConfig.impellers.w0 * (1.0 - cosf(M_PI * (tGeomShape)step / ((tGeomShape)tankConfig.impeller_startup_steps_until_normal_speed)));
+        this_step_impeller_increment_wa = 0.5 * tankConfig.impeller.blades.w0 * (1.0 - cosf(M_PI * (tGeomShape)step / ((tGeomShape)tankConfig.impeller_startup_steps_until_normal_speed)));
 
     }
     return this_step_impeller_increment_wa;
@@ -728,7 +728,7 @@ Geom_Dims Geometry::get_geom_dims(){
 
     gdata.mdiam = tankConfig.tankDiameter;
 
-    gdata.impeller_increment = tankConfig.impellers.w0;
+    gdata.impeller_increment = tankConfig.impeller.blades.w0;
 
     return gdata;
 }

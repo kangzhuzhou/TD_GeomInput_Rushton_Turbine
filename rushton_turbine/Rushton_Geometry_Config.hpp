@@ -9,6 +9,7 @@
 #ifndef Rushton_Geometry_Config_hpp
 #define Rushton_Geometry_Config_hpp
 
+#include <string>
 
 #include "define_typealias.h"
 
@@ -27,9 +28,12 @@ struct Baffles
     tGeomShape thickness = 0.0f; // Half thickness a.k.a. symmetric thickness
 };
 
-struct Impellers
+
+
+
+struct Blades
 {
-    int num_impellers = 0;
+    int num_blades = 0;
 
     tGeomShape theta = 0.0; // starting angle impeller
 
@@ -50,7 +54,12 @@ struct Disk
 };
 
 
-
+struct Impeller
+{
+    Blades blades;
+    Disk disk;
+    Disk hub;
+};
 
 
 
@@ -85,9 +94,9 @@ public:
     tGeomShape shaftRadius = 0.0f;
 
     Baffles baffles;
-    Impellers impellers;
-    Disk disk;
-    Disk hub;
+
+    int num_impellers;
+    Impeller impeller;
 
 
 };

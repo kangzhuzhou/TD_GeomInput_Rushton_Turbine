@@ -10,7 +10,8 @@
 #define Rushton_Geometry_3d_hpp
 
 #include <vector>
-
+#include <stdio.h>
+#include <cstring>
 
 #include "define_typealias.h"
 #include "define_datastructures.hpp"
