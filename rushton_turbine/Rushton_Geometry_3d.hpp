@@ -69,6 +69,12 @@ struct GeomData
 
 
 
+struct Point3D
+{
+    tGeomShape x, y, z;
+};
+
+
 
 
 class Geometry {
@@ -84,6 +90,9 @@ private:
     tGeomShape calc_this_step_impeller_increment(tStep step);
 
 
+    Point3D center;
+
+    
     void inline UpdateCoordinateFraction(tGeomShape coordinate, tNi *integerPart, tGeomShape *fractionPart);
     void inline UpdatePointFractions(GeomData &point);
     std::vector<GeomData> CreateTankWall(tNi lowerLimitX, tNi upperLimitX, bool get_solid);
@@ -92,7 +101,7 @@ private:
 
     std::vector<GeomData> CreateImpellerBlades(tStep step, tNi lowerLimitX, tNi upperLimitX, bool get_solid);
     std::vector<GeomData> CreateImpellerDisk(tNi lowerLimitX, tNi upperLimitX, bool get_solid);
-    std::vector<GeomData> CreateHub(tNi lowerLimitX, tNi upperLimitX, bool get_solid);
+    std::vector<GeomData> CreateImpellerHub(tNi lowerLimitX, tNi upperLimitX, bool get_solid);
     std::vector<GeomData> CreateImpellerShaft(tNi lowerLimitX, tNi upperLimitX, bool get_solid);
 
     void print_val(const std::vector<GeomData> &geom);
@@ -133,8 +142,6 @@ public:
         geom_rotating.clear();
         geom_rotating_solid.clear();
     }
-
-
 
 
 };
