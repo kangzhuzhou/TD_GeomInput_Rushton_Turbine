@@ -21,13 +21,6 @@
 
 
 
-struct Float3D
-{
-    float x, y, z;
-};
-
-Float3D center;
-
 
 
 
@@ -349,7 +342,7 @@ std::vector<GeomData> Geometry::CreateImpellerDisk(tNi lowerLimitX, tNi upperLim
     return result;
 }
 
-std::vector<GeomData> Geometry::CreateHub(tNi lowerLimitX, tNi upperLimitX, bool get_solid = 0)
+std::vector<GeomData> Geometry::CreateImpellerHub(tNi lowerLimitX, tNi upperLimitX, bool get_solid = 0)
 {
 
     tNi diskBottom = tNi(roundf(tankConfig.impeller.disk.bottom));
@@ -589,7 +582,7 @@ void Geometry::Init(Grid_Dims _grid, Node_Dims _node, GeometryConfig _tankConfig
     geom_rotating.insert(geom_rotating.end(), impellerDiskGeometry.begin(), impellerDiskGeometry.end());
 
     //hub
-    std::vector<GeomData> hubGeometry = CreateHub(lowerLimitX, upperLimitX);
+    std::vector<GeomData> hubGeometry = CreateImpellerHub(lowerLimitX, upperLimitX);
     geom_rotating.insert(geom_rotating.end(), hubGeometry.begin(), hubGeometry.end());
 
     
@@ -626,7 +619,7 @@ void Geometry::Init(Grid_Dims _grid, Node_Dims _node, GeometryConfig _tankConfig
     geom_fixed_solid.insert(geom_fixed_solid.end(), impellerDiskGeometry_solid.begin(), impellerDiskGeometry_solid.end());
 
     //hub
-    std::vector<GeomData> hubGeometry_solid = CreateHub(lowerLimitX, upperLimitX, get_solid);
+    std::vector<GeomData> hubGeometry_solid = CreateImpellerHub(lowerLimitX, upperLimitX, get_solid);
     geom_fixed_solid.insert(geom_fixed_solid.end(), hubGeometry_solid.begin(), hubGeometry_solid.end());
 
     //impeller shaft
