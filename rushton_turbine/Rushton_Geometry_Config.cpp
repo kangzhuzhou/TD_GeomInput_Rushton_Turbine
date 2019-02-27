@@ -45,7 +45,7 @@ void GeometryConfig::setGeometryConfig(tNi snx, tGeomShape _uav)
     num_impellers = 1;
 
 
-    impeller.blades.num_blades = 4;
+    impeller.blades.num_blades = 6;
 
     impeller.blades.theta = 0.0f;
     impeller.blades.innerRadius = tankDiameter / 12.0f;
