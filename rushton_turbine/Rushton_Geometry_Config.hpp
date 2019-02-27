@@ -19,7 +19,7 @@
 
 struct Baffles
 {
-    int num_baffles = 0;
+    int numBaffles = 0;
 
     tGeomShape firstBaffleOffset = 0.0;
 
@@ -33,16 +33,13 @@ struct Baffles
 
 struct Blades
 {
-    int num_blades = 0;
 
-    tGeomShape theta = 0.0; // starting angle impeller
 
     tGeomShape innerRadius = 0.0;
     tGeomShape outerRadius = 0.0;
     tGeomShape bottom = 0.0;
     tGeomShape top = 0.0;
     tGeomShape bladeThickness = 0.0;
-    tGeomShape w0 = 0.0; // max speed
 
 };
 
@@ -56,6 +53,22 @@ struct Disk
 
 struct Impeller
 {
+
+    int numBlades = 0;
+
+    // first blade starting angle impeller
+    tGeomShape firstBladeOffset = 0.0;
+
+    //Normal velocity at impeller tip
+    tGeomShape uav = 0.0;
+
+    // max speed
+    tGeomShape blade_tip_angular_vel_w0 = 0.0;
+
+    //impeller height
+    tGeomShape impeller_position = 0.0;
+
+
     Blades blades;
     Disk disk;
     Disk hub;
@@ -78,7 +91,7 @@ class GeometryConfig
 public:
     void setGeometryStartup(tStep starting_step, tGeomShape impeller_start_angle, tStep impeller_startup_steps_until_normal_speed);
 
-    void setGeometryConfig(tNi snx, tGeomShape uav);
+    void setGeometryConfig(tNi gridx, tGeomShape uav);
 
 
 
@@ -89,8 +102,7 @@ public:
     // Instantaneous angular velocity impeller
     tGeomShape wa = 0.0;
 
-    //Normal velocity at impeller tip
-    tGeomShape uav = 0.0;
+
 
 
     tStep starting_step = 0;
@@ -104,8 +116,8 @@ public:
 
     Baffles baffles;
 
-    int num_impellers;
-    Impeller impeller;
+    int numImpellers;
+    Impeller impeller0;
 
     Shaft shaft;
 

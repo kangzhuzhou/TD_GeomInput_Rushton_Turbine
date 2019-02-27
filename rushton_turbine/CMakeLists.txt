@@ -68,7 +68,7 @@ add_library(LIB_RUSHTON STATIC Rushton_Geometry_3d.cpp Rushton_Geometry_Config.c
 
 option(ENABLE_TESTS "Build and install tests (default OFF)" OFF)
 
-if(ENABLE_TESTS)
-    enable_testing()
-    add_subdirectory("${CMAKE_SOURCE_DIR}/tests")
-endif()
+#if(ENABLE_TESTS)
+#    enable_testing()
+#    add_subdirectory("${CMAKE_SOURCE_DIR}/tests")
+#endif()
