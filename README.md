@@ -1,6 +1,6 @@
 # Turbulent Dynamics Rushton Turbine Geometry Definition
 
-[Frontend Available Here.](http://turbulentdynamics.github.io/TD_GeomInput_Rushton_Turbine/WebGL/)
+[Frontend Available Here.](http://turbulentdynamics.github.io/TD_GeomInput_Rushton_Turbine/WebGL/build/)
 
 
 ### Install nodejs and npm.  [See spack installation](https://github.com/TurbulentDynamics/TD_env_setup_dev_info/blob/master/env_setup/install_1_with_spack.md)
