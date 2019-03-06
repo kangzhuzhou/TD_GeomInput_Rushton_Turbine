@@ -1,6 +1,9 @@
 
 *.json
 !*Template*.json
+!WebGL/package.json
+!WebGL/fonts/helvetiker_regular.typeface.json
+!WebGL/public/fonts/helvetiker_regular.typeface.json
 *.csv
 
 #ide
