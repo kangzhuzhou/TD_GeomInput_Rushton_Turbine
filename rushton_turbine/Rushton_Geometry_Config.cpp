@@ -13,7 +13,6 @@
 #include "Rushton_Geometry_Config.hpp"
 
 
-#define MDIAM_BORDER 2
 
 
 
@@ -44,8 +43,10 @@ void GeometryConfig::setGeometryConfig(tNi gridx, tGeomShape uav)
     numImpellers = 1;
 
 
-    impeller0.impeller_position = tGeomShape(gridx) / 3.0f; //center x direction
+    impeller0.impeller_position = tGeomShape(gridx) * (2.0f / 3.0f); //center x direction
+
     impeller0.numBlades = 6;
+
     impeller0.firstBladeOffset = 0.0f;
 
 
@@ -53,8 +54,9 @@ void GeometryConfig::setGeometryConfig(tNi gridx, tGeomShape uav)
     impeller0.blades.outerRadius = tankDiameter / 6.0f;
 
     // bottom height impeller blade
-    impeller0.blades.bottom = tankDiameter * 9.0f / 30.f;
-    impeller0.blades.top = tankDiameter * 11.0f / 30.f;
+    impeller0.blades.top = tankDiameter * 19.0f / 30.f;
+    impeller0.blades.bottom = tankDiameter * 21.0f / 30.f;
+
 
     // top height impeller blade
     impeller0.blades.bladeThickness = tankDiameter / 75.0f;
@@ -68,12 +70,12 @@ void GeometryConfig::setGeometryConfig(tNi gridx, tGeomShape uav)
 
 
     impeller0.disk.radius = tankDiameter / 8.0f;
-    impeller0.disk.bottom = tankDiameter * 49.0f / 150.0f;
-    impeller0.disk.top = tankDiameter * 51.0f / 150.0f;
+    impeller0.disk.top = tankDiameter * 99.0f / 150.0f;
+    impeller0.disk.bottom = tankDiameter * 101.0f / 150.0f;
 
     impeller0.hub.radius = tankDiameter * 4.0f / 75.0f;
-    impeller0.hub.bottom = tankDiameter * 9.0f / 30.0f;
-    impeller0.hub.top = tankDiameter * 11.f / 30.0f;
+    impeller0.hub.top = tankDiameter * 19.f / 30.0f;
+    impeller0.hub.bottom = tankDiameter * 21.0f / 30.0f;
 
 
 
@@ -127,7 +129,6 @@ int GeometryConfig::saveGeometryConfigAsJSON(std::string filepath){
 
 
         boost::property_tree::ptree blades_json;
-        blades_json.put<int>("numBlades", impeller0.numBlades);
         blades_json.put<tGeomShape>("innerRadius", impeller0.blades.innerRadius);
         blades_json.put<tGeomShape>("outerRadius", impeller0.blades.outerRadius);
         blades_json.put<tGeomShape>("bottom", impeller0.blades.bottom);
@@ -150,12 +151,12 @@ int GeometryConfig::saveGeometryConfigAsJSON(std::string filepath){
         jsontree.put<int>("numImpellers", numImpellers);
         boost::property_tree::ptree impeller0_json;
 
+        impeller0_json.put<int>("numBlades", impeller0.numBlades);
         impeller0_json.put<tGeomShape>("firstBladeOffset", impeller0.firstBladeOffset);
         impeller0_json.put<tGeomShape>("uav", impeller0.uav);
         impeller0_json.put<tGeomShape>("blade_tip_angular_vel_w0", impeller0.blade_tip_angular_vel_w0);
         impeller0_json.put<tGeomShape>("impeller_position", impeller0.impeller_position);
 
-        impeller0_json.put<tGeomShape>("numBlades", impeller0.numBlades);
         impeller0_json.put_child("blades", blades_json);
         impeller0_json.put_child("disk", disk_json);
         impeller0_json.put_child("hub", hub_json);
@@ -223,19 +224,23 @@ void GeometryConfig::loadGeometryConfigAsJSON(std::string filepath){
         baffles.thickness = baffles_json.get<tGeomShape>("thickness", 0);
 
 
+        numImpellers = jsontree.get<int>("numImpellers", 0);
         boost::property_tree::ptree impeller0_json = jsontree.get_child("impeller0");
 
+        impeller0.numBlades = impeller0_json.get<int>("numBlades", 0);
         impeller0.firstBladeOffset = impeller0_json.get<tGeomShape>("firstBladeOffset", 0);
         impeller0.uav = impeller0_json.get<tGeomShape>("uav", 0);
         impeller0.blade_tip_angular_vel_w0 = impeller0_json.get<tGeomShape>("blade_tip_angular_vel_w0", 0);
         impeller0.impeller_position = impeller0_json.get<tGeomShape>("impeller_position", 0);
 
-        impeller0.blades.innerRadius = impeller0_json.get<tGeomShape>("innerRadius", 0);
-        impeller0.blades.outerRadius = impeller0_json.get<tGeomShape>("outerRadius", 0);
-        impeller0.blades.bottom = impeller0_json.get<tGeomShape>("bottom", 0);
-        impeller0.blades.top = impeller0_json.get<tGeomShape>("top", 0);
-        impeller0.blades.bladeThickness = impeller0_json.get<tGeomShape>("bladeThickness", 0);
-        impeller0.blade_tip_angular_vel_w0 = impeller0_json.get<tGeomShape>("blade_tip_angular_vel_w0", 0);
+
+
+        boost::property_tree::ptree blades_json = impeller0_json.get_child("blades");
+        impeller0.blades.innerRadius = blades_json.get<tGeomShape>("innerRadius", 0);
+        impeller0.blades.outerRadius = blades_json.get<tGeomShape>("outerRadius", 0);
+        impeller0.blades.bottom = blades_json.get<tGeomShape>("bottom", 0);
+        impeller0.blades.top = blades_json.get<tGeomShape>("top", 0);
+        impeller0.blades.bladeThickness = blades_json.get<tGeomShape>("bladeThickness", 0);
 
 
 

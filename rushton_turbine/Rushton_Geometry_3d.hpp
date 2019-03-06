@@ -45,7 +45,7 @@ struct GeomData
     tGeomShape j_cart_fraction = 0.0f;
     tGeomShape k_cart_fraction = 0.0f;
 
-    
+
     tNi i_cart = 0;
     tNi j_cart = 0;
     tNi k_cart = 0;  //cell point
@@ -95,23 +95,30 @@ private:
     
     void inline UpdateCoordinateFraction(tGeomShape coordinate, tNi *integerPart, tGeomShape *fractionPart);
     void inline UpdatePointFractions(GeomData &point);
-    std::vector<GeomData> CreateTankWall(tNi lowerLimitX, tNi upperLimitX, bool get_solid);
-    std::vector<GeomData> CreateBaffles(tNi lowerLimitX, tNi upperLimitX, bool get_solid);
+    std::vector<GeomData> CreateTankWall(tNi lowerLimitY, tNi upperLimitY, bool get_solid);
+    std::vector<GeomData> CreateBaffles(tNi lowerLimitY, tNi upperLimitY, bool get_solid);
 
 
-    std::vector<GeomData> CreateImpellerBlades(tStep step, tNi lowerLimitX, tNi upperLimitX, bool get_solid);
-    std::vector<GeomData> CreateImpellerDisk(tNi lowerLimitX, tNi upperLimitX, bool get_solid);
-    std::vector<GeomData> CreateImpellerHub(tNi lowerLimitX, tNi upperLimitX, bool get_solid);
-    std::vector<GeomData> CreateImpellerShaft(tNi lowerLimitX, tNi upperLimitX, bool get_solid);
+    std::vector<GeomData> CreateImpellerBlades(tStep step, tNi lowerLimitY, tNi upperLimitY, bool get_solid);
+    std::vector<GeomData> CreateImpellerDisk(tNi lowerLimitY, tNi upperLimitY, bool get_solid);
+    std::vector<GeomData> CreateImpellerHub(tNi lowerLimitY, tNi upperLimitY, bool get_solid);
+    std::vector<GeomData> CreateImpellerShaft(tNi lowerLimitY, tNi upperLimitY, bool get_solid);
 
     void print_val(const std::vector<GeomData> &geom);
 
 public:
-    std::vector<GeomData> geom_fixed;
-    std::vector<GeomData> geom_fixed_solid;
 
-    std::vector<GeomData> geom_rotating;
-    std::vector<GeomData> geom_rotating_solid;
+    //Tank and baffle surface points
+    std::vector<GeomData> geom_fixed_surface;
+
+    //Baffles internal points
+    std::vector<GeomData> geom_fixed_internal;
+
+    //Blade surface and internal points
+    std::vector<GeomData> geom_rotating_surface_and_internal_blades;
+
+    //Shaft and hub internal points
+//    std::vector<GeomData> geom_rotating_static_internal;
 
 
     void Init(Grid_Dims, Node_Dims, GeometryConfig);
@@ -135,12 +142,12 @@ public:
     
     void clear_vectors(){
 
-        geom_fixed.clear();
-        geom_fixed_solid.clear();
+        geom_fixed_surface.clear();
+        geom_fixed_internal.clear();
 
 
-        geom_rotating.clear();
-        geom_rotating_solid.clear();
+        geom_rotating_surface_and_internal_blades.clear();
+//        geom_rotating_static_internal.clear();
     }
 
 

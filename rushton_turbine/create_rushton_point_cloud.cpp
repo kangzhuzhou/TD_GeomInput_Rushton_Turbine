@@ -10,6 +10,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "iostream"
+
+
 #ifdef _OPENMP
 #include <omp.h>
 #endif
@@ -30,27 +33,31 @@
 
 
 
+
+
+
+
 int main(){
 
     Grid_Dims grid;
     grid.ngx = 1;
     grid.ngy = 1;
     grid.ngz = 1;
-    grid.x = 302;
-    grid.y = 302;
-    grid.z = 302;
+    grid.x = 200;
+    grid.y = 200;
+    grid.z = 200;
 
 
 
     Node_Dims node;
-    node.numprocs = 1;
-    node.rank = 0;
-    node.nthreads = 1;
     node.x = grid.x / grid.ngx;
     node.y = grid.y / grid.ngy;
     node.z = grid.z / grid.ngz;
 
-    
+    node.idi = 0;
+    node.idj = 0;
+    node.idk = 0;
+
 
 
     tStep starting_step = 0;
@@ -76,12 +83,22 @@ int main(){
     
     
     
-    geometry.print_geometry_points_csv("tank_geometry.csv", geometry.geom_fixed, "");
-    geometry.print_geometry_points_csv("tank_geometry.csv", geometry.geom_rotating, "append");
+    geometry.print_geometry_points_csv("tank_geometry.csv", geometry.geom_fixed_surface, "");
+    geometry.print_geometry_points_csv("tank_geometry.csv", geometry.geom_rotating_surface_and_internal_blades, "append");
 
-    geometry.print_geometry_points_csv("tank_geometry.csv", geometry.geom_fixed_solid, "append");
-    geometry.print_geometry_points_csv("tank_geometry.csv", geometry.geom_rotating_solid, "append");
+    geometry.print_geometry_points_csv("tank_geometry.csv", geometry.geom_fixed_internal, "append");
+//    geometry.print_geometry_points_csv("tank_geometry.csv", geometry.geom_rotating_static_internal, "append");
 
 
+    Multi_Timer timer;
+    tGeomShape teta = 0.0;
+
+
+
+    geometry.print_geometry_points_csv("updated_tank_geometry.csv", geometry.geom_fixed_surface, "");
+    geometry.print_geometry_points_csv("updated_tank_geometry.csv", geometry.geom_rotating_surface_and_internal_blades, "append");
+
+    geometry.print_geometry_points_csv("updated_tank_geometry.csv", geometry.geom_fixed_internal, "append");
+//    geometry.print_geometry_points_csv("updated_tank_geometry.csv", geometry.geom_rotating_static_internal, "append");
 
 }

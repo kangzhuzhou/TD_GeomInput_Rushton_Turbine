@@ -78,7 +78,16 @@ inline bool grid_i_on_node(tNi gi, Node_Bounds f){
     return 0;
 }
 
+inline bool grid_j_on_node(tNi gj, Node_Bounds f){
+    if (gj >= f.j0 && gj <= f.j1) return 1;
+    return 0;
+}
 
+
+inline bool grid_k_on_node(tNi gk, Node_Bounds f){
+    if (gk >= f.k0 && gk <= f.k1) return 1;
+    return 0;
+}
 
 
 #endif /* Header_h */

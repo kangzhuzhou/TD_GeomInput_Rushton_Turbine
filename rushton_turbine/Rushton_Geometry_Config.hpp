@@ -14,6 +14,7 @@
 #include "define_typealias.h"
 
 
+#define MDIAM_BORDER 2
 
 
 
@@ -29,19 +30,15 @@ struct Baffles
 };
 
 
-
-
 struct Blades
 {
-
-
     tGeomShape innerRadius = 0.0;
     tGeomShape outerRadius = 0.0;
     tGeomShape bottom = 0.0;
     tGeomShape top = 0.0;
     tGeomShape bladeThickness = 0.0;
-
 };
+
 
 struct Disk
 {
@@ -53,7 +50,6 @@ struct Disk
 
 struct Impeller
 {
-
     int numBlades = 0;
 
     // first blade starting angle impeller
@@ -99,7 +95,7 @@ public:
     void loadGeometryConfigAsJSON(std::string filepath);
 
 
-    // Instantaneous angular velocity impeller
+    // Current step angular velocity impeller
     tGeomShape wa = 0.0;
 
 

@@ -46,26 +46,26 @@ void inline Geometry::UpdatePointFractions(GeomData &point)
 
 
 
-std::vector<GeomData> Geometry::CreateTankWall(tNi lowerLimitX, tNi upperLimitX, bool get_solid = 0)
+std::vector<GeomData> Geometry::CreateTankWall(tNi lowerLimitY, tNi upperLimitY, bool get_solid = 0)
 {
     tNi nCircPoints = 4 * tNi(roundf(M_PI * tankConfig.tankDiameter / (4 * tankConfig.resolution)));
     tGeomShape dTheta = 2.0f * M_PI / tGeomShape(nCircPoints);
     tGeomShape r = 0.5f * tankConfig.tankDiameter;
     
     std::vector<GeomData> result;
-    for(tNi x = lowerLimitX; x <= upperLimitX; ++x)
+    for(tNi y = lowerLimitY; y <= upperLimitY; ++y)
     {
         for (tNi k = 0; k <= nCircPoints - 1; ++k)
         {
             tGeomShape theta = tGeomShape(k) * dTheta;
-            if ((x & 1) == 1)
+            if ((y & 1) == 1)
                 theta += 0.5f * dTheta;
             
             
             GeomData g;
             g.resolution = tankConfig.resolution;
-            g.i_cart_fp = (tGeomShape)x + 0.5f;
-            g.j_cart_fp = center.y + r * cosf(theta);
+            g.i_cart_fp = center.x + r * cosf(theta);
+            g.j_cart_fp = (tGeomShape)y + 0.5f;
             g.k_cart_fp = center.z + r * sinf(theta);
             g.is_solid = 0;
             
@@ -93,7 +93,7 @@ std::vector<GeomData> Geometry::CreateTankWall(tNi lowerLimitX, tNi upperLimitX,
 
 
 
-std::vector<GeomData> Geometry::CreateBaffles(tNi lowerLimitX, tNi upperLimitX, bool get_solid = 0)
+std::vector<GeomData> Geometry::CreateBaffles(tNi lowerLimitY, tNi upperLimitY, bool get_solid = 0)
 {
     tNi nPointsBaffleThickness = tNi(roundf(tankConfig.baffles.thickness / tankConfig.resolution));
     if (nPointsBaffleThickness == 0)
@@ -111,7 +111,7 @@ std::vector<GeomData> Geometry::CreateBaffles(tNi lowerLimitX, tNi upperLimitX, 
     std::vector<GeomData> result;
     for (tNi nBaffle = 1; nBaffle <= (tNi)tankConfig.baffles.numBaffles; ++nBaffle)
     {
-        for(tNi x = lowerLimitX; x <= upperLimitX; ++x)
+        for (tNi y = lowerLimitY; y <= upperLimitY; ++y)
         {
             for (tNi idxR = 0; idxR <= nPointsR; ++idxR)
             {
@@ -128,9 +128,11 @@ std::vector<GeomData> Geometry::CreateBaffles(tNi lowerLimitX, tNi upperLimitX, 
                     
                     GeomData g;
                     g.resolution = tankConfig.resolution;
-                    g.i_cart_fp = (tGeomShape)x + 0.5f;
-                    g.j_cart_fp = center.y + r * cosf(theta);
+
+                    g.i_cart_fp = center.x + r * cosf(theta);
+                    g.j_cart_fp = (tGeomShape)y + 0.5f;
                     g.k_cart_fp = center.z + r * sinf(theta);
+
                     g.is_solid = isSurface ? 0 : 1;
                     
                     //Separates the int and decimal part of float.  int is used for calculation in Forcing
@@ -162,7 +164,7 @@ std::vector<GeomData> Geometry::CreateBaffles(tNi lowerLimitX, tNi upperLimitX, 
 
 
 
-std::vector<GeomData> Geometry::CreateImpellerBlades(tStep step, tNi lowerLimitX, tNi upperLimitX, bool get_solid = 0)
+std::vector<GeomData> Geometry::CreateImpellerBlades(tStep step, tNi lowerLimitY, tNi upperLimitY, bool get_solid = 0)
 {
     double innerRadius = tankConfig.impeller0.blades.innerRadius;
     double outerRadius = tankConfig.impeller0.blades.outerRadius;
@@ -171,9 +173,9 @@ std::vector<GeomData> Geometry::CreateImpellerBlades(tStep step, tNi lowerLimitX
     tNi impellerBottom = tNi(roundf(tankConfig.impeller0.blades.bottom));
     tNi impellerTop = tNi(roundf(tankConfig.impeller0.blades.top));
     
-    lowerLimitX = std::max(lowerLimitX, impellerBottom);
-    upperLimitX = std::min(upperLimitX, impellerTop);
-    
+    lowerLimitY = std::max(lowerLimitY, impellerTop);
+    upperLimitY = std::min(upperLimitY, impellerBottom);
+
     tGeomShape nPointsR = tNi(roundf((outerRadius - innerRadius) / tankConfig.resolution));
     tGeomShape nPointsThickness = tNi(roundf(tankConfig.impeller0.blades.bladeThickness / tankConfig.resolution));
     if (nPointsThickness == 0)
@@ -198,7 +200,7 @@ std::vector<GeomData> Geometry::CreateImpellerBlades(tStep step, tNi lowerLimitX
     std::vector<GeomData> result;
     for (tNi nBlade = 1; nBlade <= tankConfig.impeller0.numBlades; ++nBlade)
     {
-        for (tNi x = lowerLimitX; x <= upperLimitX; ++x)
+        for (tNi y = lowerLimitY; y <= upperLimitY; ++y)
         {
             for (tNi idxR = 0; idxR <= nPointsR; ++idxR)
             {
@@ -209,24 +211,26 @@ std::vector<GeomData> Geometry::CreateImpellerBlades(tStep step, tNi lowerLimitX
                     tankConfig.impeller0.firstBladeOffset +
                     (idxThickness - nPointsThickness / 2.0f) * resolutionBladeThickness / r;
                     
-                    bool insideDisc = (r <= tankConfig.impeller0.disk.radius) && (x >= discBottom) && (x <= discTop);
+                    bool insideDisc = (r <= tankConfig.impeller0.disk.radius) && (y >= discBottom) && (y <= discTop);
                     if(insideDisc)
                         continue;
                     
                     bool isSurface = idxThickness == 0 || idxThickness == nPointsThickness ||
                     idxR == 0 || idxR == nPointsR ||
-                    x == impellerBottom || x == impellerTop;
+                    y == impellerBottom || y == impellerTop;
                     
                     GeomData g;
                     g.resolution = tankConfig.resolution;
                     g.r_polar = r;
                     g.t_polar = theta;
-                    g.i_cart_fp = (tGeomShape)x - 0.5f;
-                    g.j_cart_fp = center.y + r * cosf(theta);
+                    g.i_cart_fp = center.x + r * cosf(theta);
+                    g.j_cart_fp = (tGeomShape)y - 0.5f;
                     g.k_cart_fp = center.z + r * sinf(theta);
-                    g.u_delta_fp = 0.;
-                    g.v_delta_fp = -wa * g.r_polar * sinf(g.t_polar);
+
+                    g.u_delta_fp = -wa * g.r_polar * sinf(g.t_polar);
+                    g.v_delta_fp = 0.;
                     g.w_delta_fp = wa * g.r_polar * cosf(g.t_polar);
+
                     g.is_solid = isSurface ? 0 : 1;
 
                     
@@ -236,8 +240,8 @@ std::vector<GeomData> Geometry::CreateImpellerBlades(tStep step, tNi lowerLimitX
 
                     
                     
-                    if (grid_i_on_node(g.i_cart, node_bounds)){
-                        g.i_cart = convert_i_grid_to_i_node(g.i_cart, node, node_bounds);
+                    if (grid_j_on_node(g.j_cart, node_bounds)){
+                        g.j_cart = convert_j_grid_to_j_node(g.j_cart, node, node_bounds);
 
 
                         //BOTH THE SOLID AND SURFACE ELEMENTS ARE ROTATING
@@ -255,7 +259,7 @@ std::vector<GeomData> Geometry::CreateImpellerBlades(tStep step, tNi lowerLimitX
 
 
 
-std::vector<GeomData> Geometry::CreateImpellerDisk(tNi lowerLimitX, tNi upperLimitX, bool get_solid = 0)
+std::vector<GeomData> Geometry::CreateImpellerDisk(tNi lowerLimitY, tNi upperLimitY, bool get_solid = 0)
 {
     tNi bottom = tNi(roundf(tankConfig.impeller0.disk.bottom));
     tNi top = tNi(roundf(tankConfig.impeller0.disk.top));
@@ -265,11 +269,11 @@ std::vector<GeomData> Geometry::CreateImpellerDisk(tNi lowerLimitX, tNi upperLim
     tNi nPointsR = tNi(round((diskRadius - hubRadius) / tankConfig.resolution));
     tGeomShape deltaR = (diskRadius - hubRadius) / tGeomShape(nPointsR);
 
-    lowerLimitX = std::max(lowerLimitX, bottom);
-    upperLimitX = std::min(upperLimitX, top);
+    lowerLimitY = std::max(lowerLimitY, top);
+    upperLimitY = std::min(upperLimitY, bottom);
 
     std::vector<GeomData> result;
-    for (tNi x = lowerLimitX; x <= upperLimitX; ++x)
+    for (tNi y = lowerLimitY; y <= upperLimitY; ++y)
     {
         for (tNi idxR = 1; idxR <= nPointsR; ++idxR)
         {
@@ -287,25 +291,26 @@ std::vector<GeomData> Geometry::CreateImpellerDisk(tNi lowerLimitX, tNi upperLim
             tGeomShape theta0 = tankConfig.impeller0.firstBladeOffset;
             if ((idxR & 1) == 0)
                 theta0 += 0.5f * dTheta;
-            if ((x & 1) == 0)
+            if ((y & 1) == 0)
                 theta0 += 0.5f * dTheta;
 
             for (tNi idxTheta = 0; idxTheta <= nPointsTheta - 1; ++idxTheta)
             {
-                bool isSurface = x == bottom || x == top || idxR == nPointsR;
+                bool isSurface = y == bottom || y == top || idxR == nPointsR;
 
                 GeomData g;
                 g.r_polar = r;
                 g.t_polar = theta0 + idxTheta * dTheta;
                 g.resolution = tankConfig.resolution * tankConfig.resolution;
 
-                g.i_cart_fp = (tGeomShape)x - 0.5f;
-                g.j_cart_fp = center.y + r * cos(g.t_polar);
+                g.i_cart_fp = center.x + r * cos(g.t_polar);
+                g.j_cart_fp = (tGeomShape)y - 0.5f;
                 g.k_cart_fp = center.z + r * sin(g.t_polar);
 
-                g.u_delta_fp = 0;
-                g.v_delta_fp = -tankConfig.wa * g.r_polar * sinf(g.t_polar);
+                g.u_delta_fp = -tankConfig.wa * g.r_polar * sinf(g.t_polar);
+                g.v_delta_fp = 0;
                 g.w_delta_fp = tankConfig.wa * g.r_polar * cosf(g.t_polar);
+
                 g.is_solid = isSurface ? 0 : 1;
 
 
@@ -328,8 +333,8 @@ std::vector<GeomData> Geometry::CreateImpellerDisk(tNi lowerLimitX, tNi upperLim
                     }
                 }
                 if (get_solid == 0 && g.is_solid == 0) {
-                    if (grid_i_on_node(g.i_cart, node_bounds)){
-                        g.i_cart = convert_i_grid_to_i_node(g.i_cart, node, node_bounds);
+                    if (grid_j_on_node(g.j_cart, node_bounds)){
+                        g.j_cart = convert_j_grid_to_j_node(g.j_cart, node, node_bounds);
                         result.push_back(g);
                     }
                 }
@@ -342,7 +347,7 @@ std::vector<GeomData> Geometry::CreateImpellerDisk(tNi lowerLimitX, tNi upperLim
     return result;
 }
 
-std::vector<GeomData> Geometry::CreateImpellerHub(tNi lowerLimitX, tNi upperLimitX, bool get_solid = 0)
+std::vector<GeomData> Geometry::CreateImpellerHub(tNi lowerLimitY, tNi upperLimitY, bool get_solid = 0)
 {
 
     tNi diskBottom = tNi(roundf(tankConfig.impeller0.disk.bottom));
@@ -357,13 +362,13 @@ std::vector<GeomData> Geometry::CreateImpellerHub(tNi lowerLimitX, tNi upperLimi
     tNi nPointsR = tNi(roundf((hubRadius - tankConfig.shaft.radius) / tankConfig.resolution));
     tGeomShape resolutionR = (hubRadius - tankConfig.shaft.radius) / tGeomShape(nPointsR);
 
-    lowerLimitX = std::max(lowerLimitX, bottom);
-    upperLimitX = std::min(upperLimitX, top);
+    lowerLimitY = std::max(lowerLimitY, top);
+    upperLimitY = std::min(upperLimitY, bottom);
 
     std::vector<GeomData> result;
-    for (tNi x = lowerLimitX; x <= upperLimitX; ++x)
+    for (tNi y = lowerLimitY; y <= upperLimitY; ++y)
     {
-        bool isWithinDisk = x >= diskBottom && x <= diskTop;
+        bool isWithinDisk = y >= diskBottom && y <= diskTop;
 
 
         for (tNi idxR = 1; idxR <= nPointsR; ++idxR)
@@ -382,12 +387,12 @@ std::vector<GeomData> Geometry::CreateImpellerHub(tNi lowerLimitX, tNi upperLimi
             tGeomShape theta0 = tankConfig.impeller0.firstBladeOffset;
             if ((idxR & 1) == 0)
                 theta0 += 0.5f * dTheta;
-            if ((x & 1) == 0)
+            if ((y & 1) == 0)
                 theta0 += 0.5f * dTheta;
 
             for (tNi idxTheta = 0; idxTheta <= nPointsTheta - 1; ++idxTheta)
             {
-                bool isSurface = (x == bottom || x == top || idxR == nPointsR) && !isWithinDisk;
+                bool isSurface = (y == bottom || y == top || idxR == nPointsR) && !isWithinDisk;
 
 
                 GeomData g;
@@ -395,12 +400,12 @@ std::vector<GeomData> Geometry::CreateImpellerHub(tNi lowerLimitX, tNi upperLimi
                 g.t_polar = theta0 + idxTheta * dTheta;
                 g.resolution = tankConfig.resolution * tankConfig.resolution;
 
-                g.i_cart_fp = (tGeomShape)x - 0.5f;
-                g.j_cart_fp = center.y + r * cos(g.t_polar);
+                g.i_cart_fp = center.x + r * cos(g.t_polar);
+                g.j_cart_fp = (tGeomShape)y - 0.5f;
                 g.k_cart_fp = center.z + r * sin(g.t_polar);
 
-                g.u_delta_fp = 0;
-                g.v_delta_fp = -tankConfig.wa * g.r_polar * sinf(g.t_polar);
+                g.u_delta_fp = -tankConfig.wa * g.r_polar * sinf(g.t_polar);
+                g.v_delta_fp = 0;
                 g.w_delta_fp = tankConfig.wa * g.r_polar * cosf(g.t_polar);
                 g.is_solid = isSurface ? 0 : 1;
 
@@ -424,8 +429,8 @@ std::vector<GeomData> Geometry::CreateImpellerHub(tNi lowerLimitX, tNi upperLimi
                     }
                 }
                 if (get_solid == 0 && g.is_solid == 0) {
-                    if (grid_i_on_node(g.i_cart, node_bounds)){
-                        g.i_cart = convert_i_grid_to_i_node(g.i_cart, node, node_bounds);
+                    if (grid_j_on_node(g.j_cart, node_bounds)){
+                        g.j_cart = convert_j_grid_to_j_node(g.j_cart, node, node_bounds);
                         result.push_back(g);
                     }
                 }
@@ -439,15 +444,15 @@ std::vector<GeomData> Geometry::CreateImpellerHub(tNi lowerLimitX, tNi upperLimi
 }
 
 
-std::vector<GeomData> Geometry::CreateImpellerShaft(tNi lowerLimitX, tNi upperLimitX, bool get_solid = 0)
+std::vector<GeomData> Geometry::CreateImpellerShaft(tNi lowerLimitY, tNi upperLimitY, bool get_solid = 0)
 {
     tNi hubBottom = tNi(roundf(tankConfig.impeller0.hub.bottom));
     tNi hubTop = tNi(roundf(tankConfig.impeller0.hub.top));
 
     std::vector<GeomData> result;
-    for (tNi x = lowerLimitX; x <= upperLimitX; ++x)
+    for (tNi y = lowerLimitY; y <= upperLimitY; ++y)
     {
-        bool isWithinHub = x >= hubBottom && x <= hubTop;
+        bool isWithinHub = y >= hubBottom && y <= hubTop;
 
 
         tGeomShape rEnd = tankConfig.shaft.radius; // isWithinHub ? modelConfig.hub.radius : modelConfig.shaft.radius;
@@ -475,7 +480,7 @@ std::vector<GeomData> Geometry::CreateImpellerShaft(tNi lowerLimitX, tNi upperLi
             for (tNi idxTheta = 0; idxTheta < nPointsTheta; ++idxTheta)
             {
                 tGeomShape theta = idxTheta * dTheta;
-                if ((x & 1) == 0)
+                if ((y & 1) == 0)
                     theta += 0.5f * dTheta;
 
                 bool isSurface = idxR == nPointsR && !isWithinHub;
@@ -483,11 +488,12 @@ std::vector<GeomData> Geometry::CreateImpellerShaft(tNi lowerLimitX, tNi upperLi
                 g.r_polar = r;
                 g.t_polar = theta;
                 g.resolution = tankConfig.resolution;
-                g.i_cart_fp = (tGeomShape)x- 0.5f;
-                g.j_cart_fp = center.y + r * cosf(theta);
+                g.i_cart_fp = center.x + r * cosf(theta);
+                g.j_cart_fp = (tGeomShape)y- 0.5f;
                 g.k_cart_fp = center.z + r * sinf(theta);
-                g.u_delta_fp = 0.0f;
-                g.v_delta_fp = -tankConfig.wa * g.r_polar * sinf(g.t_polar);
+
+                g.u_delta_fp = -tankConfig.wa * g.r_polar * sinf(g.t_polar);
+                g.v_delta_fp = 0.0f;
                 g.w_delta_fp =  tankConfig.wa * g.r_polar * cosf(g.t_polar);
                 g.is_solid = isSurface ? 0 : 1;
 
@@ -512,8 +518,8 @@ std::vector<GeomData> Geometry::CreateImpellerShaft(tNi lowerLimitX, tNi upperLi
                     }
                 }
                 if (get_solid == 0 && g.is_solid == 0) {
-                    if (grid_i_on_node(g.i_cart, node_bounds)){
-                        g.i_cart = convert_i_grid_to_i_node(g.i_cart, node, node_bounds);
+                    if (grid_j_on_node(g.j_cart, node_bounds)){
+                        g.j_cart = convert_j_grid_to_j_node(g.j_cart, node, node_bounds);
                         result.push_back(g);
                     }
                 }
@@ -538,11 +544,11 @@ std::vector<GeomData> Geometry::CreateImpellerShaft(tNi lowerLimitX, tNi upperLi
 
 void Geometry::Init(Grid_Dims _grid, Node_Dims _node, GeometryConfig _tankConfig)
 {
-    geom_fixed.clear();
-    geom_rotating.clear();
+    geom_fixed_surface.clear();
+    geom_rotating_surface_and_internal_blades.clear();
     
-    geom_fixed_solid.clear();
-    geom_rotating_solid.clear();
+    geom_fixed_internal.clear();
+//    geom_rotating_static_internal.clear();
 
 
     grid = _grid;
@@ -551,45 +557,16 @@ void Geometry::Init(Grid_Dims _grid, Node_Dims _node, GeometryConfig _tankConfig
 
     node_bounds = get_node_bounds(node, grid);
 
-    tNi lowerLimitX = node_bounds.i0;
-    tNi upperLimitX = node_bounds.i1;
+    tNi lowerLimitY = node_bounds.j0;
+    tNi upperLimitY = node_bounds.j1;
 
-    if (node.idi == 0) lowerLimitX = 1;
-    if (node.idi == grid.ngx - 1) upperLimitX -= 1;
+    if (node.idj == 0) lowerLimitY = 1;
+    if (node.idj == grid.ngy - 1) upperLimitY -= 1;
 
 
-    center.x = tGeomShape(grid.x) / 3.0f; //center x direction
-    center.y = tGeomShape(grid.y) / 2.0f; //center y direction
+    center.x = tGeomShape(grid.x) / 2.0f; //center x direction
+    center.y = tankConfig.impeller0.impeller_position; //position of impeller, from the top
     center.z = tGeomShape(grid.z) / 2.0f; //center z direction
-
-    
-    // Reactor wall
-    std::vector<GeomData> wallGeometry = CreateTankWall(lowerLimitX, upperLimitX);
-    geom_fixed.insert(geom_fixed.end(), wallGeometry.begin(), wallGeometry.end());
-
-    // baffles
-    std::vector<GeomData> bafflesGeometry = CreateBaffles(lowerLimitX, upperLimitX);
-    geom_fixed.insert(geom_fixed.end(), bafflesGeometry.begin(), bafflesGeometry.end());
-
-
-
-
-    // impeller blades
-    std::vector<GeomData> impellerBladesGeometry = CreateImpellerBlades(tankConfig.starting_step, lowerLimitX, upperLimitX);
-    geom_rotating.insert(geom_rotating.end(), impellerBladesGeometry.begin(), impellerBladesGeometry.end());
-
-    //impeller disk
-    std::vector<GeomData> impellerDiskGeometry = CreateImpellerDisk(lowerLimitX, upperLimitX);
-    geom_rotating.insert(geom_rotating.end(), impellerDiskGeometry.begin(), impellerDiskGeometry.end());
-
-    //hub
-    std::vector<GeomData> hubGeometry = CreateImpellerHub(lowerLimitX, upperLimitX);
-    geom_rotating.insert(geom_rotating.end(), hubGeometry.begin(), hubGeometry.end());
-
-    
-    //impeller shaft
-    std::vector<GeomData> impellerShaftGeometry = CreateImpellerShaft(lowerLimitX, upperLimitX);
-    geom_rotating.insert(geom_rotating.end(), impellerShaftGeometry.begin(), impellerShaftGeometry.end());
 
 
 
@@ -597,35 +574,70 @@ void Geometry::Init(Grid_Dims _grid, Node_Dims _node, GeometryConfig _tankConfig
     //Solid are the internal points, while above is only the surface rotating
     bool get_solid = 1;
 
-    // Reactor wall
-    std::vector<GeomData> wallGeometry_solid = CreateTankWall(lowerLimitX, upperLimitX, get_solid);
-    geom_fixed_solid.insert(geom_fixed_solid.end(), wallGeometry_solid.begin(), wallGeometry_solid.end());
+
+
+    
+    // Tank wall
+    std::vector<GeomData> wallGeometry = CreateTankWall(lowerLimitY, upperLimitY);
+    geom_fixed_surface.insert(geom_fixed_surface.end(), wallGeometry.begin(), wallGeometry.end());
+
+
+
 
     // baffles
-    std::vector<GeomData> bafflesGeometry_solid = CreateBaffles(lowerLimitX, upperLimitX, get_solid);
-    geom_fixed_solid.insert(geom_fixed_solid.end(), bafflesGeometry_solid.begin(), bafflesGeometry_solid.end());
+    std::vector<GeomData> bafflesGeometry = CreateBaffles(lowerLimitY, upperLimitY);
+    geom_fixed_surface.insert(geom_fixed_surface.end(), bafflesGeometry.begin(), bafflesGeometry.end());
+
+    std::vector<GeomData> bafflesGeometry_solid = CreateBaffles(lowerLimitY, upperLimitY, get_solid);
+    geom_fixed_internal.insert(geom_fixed_internal.end(), bafflesGeometry_solid.begin(), bafflesGeometry_solid.end());
 
 
 
-    //ONLY THE BLADE SOLID ELEMENTS ARE ROTATING
-    // impeller blades
-    std::vector<GeomData> impellerBladesGeometry_solid = CreateImpellerBlades(tankConfig.starting_step, lowerLimitX, upperLimitX, get_solid);
-    geom_rotating_solid.insert(geom_rotating_solid.end(), impellerBladesGeometry_solid.begin(), impellerBladesGeometry_solid.end());
+
+
+
+
+
+    // impeller blades, both surface and internal elements are rotated
+    std::vector<GeomData> impellerBladesGeometry = CreateImpellerBlades(tankConfig.starting_step, lowerLimitY, upperLimitY);
+    geom_rotating_surface_and_internal_blades.insert(geom_rotating_surface_and_internal_blades.end(), impellerBladesGeometry.begin(), impellerBladesGeometry.end());
+
+
+    std::vector<GeomData> impellerBladesGeometry_solid = CreateImpellerBlades(tankConfig.starting_step, lowerLimitY, upperLimitY, get_solid);
+    geom_rotating_surface_and_internal_blades.insert(geom_rotating_surface_and_internal_blades.end(), impellerBladesGeometry_solid.begin(), impellerBladesGeometry_solid.end());
+
+
 
 
 
 
     //impeller disk
-    std::vector<GeomData> impellerDiskGeometry_solid = CreateImpellerDisk(lowerLimitX, upperLimitX, get_solid);
-    geom_fixed_solid.insert(geom_fixed_solid.end(), impellerDiskGeometry_solid.begin(), impellerDiskGeometry_solid.end());
+    std::vector<GeomData> impellerDiskGeometry = CreateImpellerDisk(lowerLimitY, upperLimitY);
+    geom_rotating_surface_and_internal_blades.insert(geom_rotating_surface_and_internal_blades.end(), impellerDiskGeometry.begin(), impellerDiskGeometry.end());
+
+    std::vector<GeomData> impellerDiskGeometry_solid = CreateImpellerDisk(lowerLimitY, upperLimitY, get_solid);
+    geom_fixed_internal.insert(geom_fixed_internal.end(), impellerDiskGeometry_solid.begin(), impellerDiskGeometry_solid.end());
+
+
 
     //hub
-    std::vector<GeomData> hubGeometry_solid = CreateImpellerHub(lowerLimitX, upperLimitX, get_solid);
-    geom_fixed_solid.insert(geom_fixed_solid.end(), hubGeometry_solid.begin(), hubGeometry_solid.end());
+    std::vector<GeomData> hubGeometry = CreateImpellerHub(lowerLimitY, upperLimitY);
+    geom_rotating_surface_and_internal_blades.insert(geom_rotating_surface_and_internal_blades.end(), hubGeometry.begin(), hubGeometry.end());
 
+
+    std::vector<GeomData> hubGeometry_solid = CreateImpellerHub(lowerLimitY, upperLimitY, get_solid);
+    geom_fixed_internal.insert(geom_fixed_internal.end(), hubGeometry_solid.begin(), hubGeometry_solid.end());
+
+
+
+    
     //impeller shaft
-    std::vector<GeomData> impellerShaftGeometry_solid = CreateImpellerShaft(lowerLimitX, upperLimitX, get_solid);
-    geom_fixed_solid.insert(geom_fixed_solid.end(), impellerShaftGeometry_solid.begin(), impellerShaftGeometry_solid.end());
+    std::vector<GeomData> impellerShaftGeometry = CreateImpellerShaft(lowerLimitY, upperLimitY);
+    geom_rotating_surface_and_internal_blades.insert(geom_rotating_surface_and_internal_blades.end(), impellerShaftGeometry.begin(), impellerShaftGeometry.end());
+
+
+    std::vector<GeomData> impellerShaftGeometry_solid = CreateImpellerShaft(lowerLimitY, upperLimitY, get_solid);
+    geom_fixed_internal.insert(geom_fixed_internal.end(), impellerShaftGeometry_solid.begin(), impellerShaftGeometry_solid.end());
 
 
 }
@@ -664,31 +676,31 @@ tGeomShape Geometry::Update(Multi_Timer &timer, tStep step, tGeomShape impellerT
 
     tGeomShape this_step_impeller_increment_wa = calc_this_step_impeller_increment(step);
 
-    impellerTheta = impellerTheta + this_step_impeller_increment_wa;
+    impellerTheta += this_step_impeller_increment_wa;
 
 
 
 
 
     //Only updates the rotating elements
-//        for (GeomData &g: geom_rotating)
+
     #pragma omp parallel for
-    for (int i = 0; i < geom_rotating.size(); i++)
+    for (int i = 0; i < geom_rotating_surface_and_internal_blades.size(); i++)
     {
 
-        GeomData &g = geom_rotating[i];
+        GeomData &g = geom_rotating_surface_and_internal_blades[i];
 
         g.t_polar += this_step_impeller_increment_wa;
 
 
 
-        g.j_cart_fp = center.y + g.r_polar * cosf(g.t_polar);
+        g.i_cart_fp = center.x + g.r_polar * cosf(g.t_polar);
         g.k_cart_fp = center.z + g.r_polar * sinf(g.t_polar);
 
-        g.v_delta_fp = -this_step_impeller_increment_wa * g.r_polar * sinf(g.t_polar);
+        g.u_delta_fp = -this_step_impeller_increment_wa * g.r_polar * sinf(g.t_polar);
         g.w_delta_fp =  this_step_impeller_increment_wa * g.r_polar * cosf(g.t_polar);
 
-        UpdateCoordinateFraction(g.j_cart_fp, &g.j_cart, &g.j_cart_fraction);
+        UpdateCoordinateFraction(g.i_cart_fp, &g.i_cart, &g.i_cart_fraction);
         UpdateCoordinateFraction(g.k_cart_fp, &g.k_cart, &g.k_cart_fraction);
 
 

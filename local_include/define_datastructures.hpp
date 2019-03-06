@@ -34,7 +34,6 @@ struct Grid_Dims
     t3d ngy = 0;
     t3d ngz = 0;
 
-    //Formally gridx, number of cells in each direction
     tNi x = 0;
     tNi y = 0;
     tNi z = 0;
