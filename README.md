@@ -18,7 +18,7 @@ octave display_rushton_geometry.m
 ![Rushton Point Cloud](Rushton_Points.png)
 
 ## Rushton Turbine Image
-![Rushton Turbine](Turbine.png)
+![Rushton Turbine](WebGL_frontend.png)
 
 
 
