@@ -123,6 +123,9 @@ public:
 
     void Init(Grid_Dims, Node_Dims, GeometryConfig);
 
+    tGeomShape Init_at_angle(tGeomShape angle, tStep step, Grid_Dims grid, Node_Dims node, GeometryConfig tankConfig);
+
+    
 
     tGeomShape Update(Multi_Timer &timer, tStep step, tGeomShape impellerTheta);
     void setRotatingSolid(Multi_Timer &timer, tStep step, tGeomShape set_impellerTheta);
@@ -149,6 +152,10 @@ public:
         geom_rotating_surface_and_internal_blades.clear();
 //        geom_rotating_static_internal.clear();
     }
+
+
+    void Checkpoint_Load();
+    void Checkpoint_Save();
 
 
 };

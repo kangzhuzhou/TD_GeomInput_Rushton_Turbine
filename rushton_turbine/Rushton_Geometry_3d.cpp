@@ -538,6 +538,38 @@ std::vector<GeomData> Geometry::CreateImpellerShaft(tNi lowerLimitY, tNi upperLi
 
 
 
+tGeomShape Geometry::Init_at_angle(tGeomShape angle, tStep step, Grid_Dims grid, Node_Dims node, GeometryConfig tankConfig)
+{
+
+    Init(grid, node, tankConfig);
+
+    tGeomShape this_step_impeller_increment_wa = calc_this_step_impeller_increment(step);
+
+
+    #pragma omp parallel for
+    for (tNi i = 0; i < geom_rotating_surface_and_internal_blades.size(); i++)
+    {
+
+        GeomData &g = geom_rotating_surface_and_internal_blades[i];
+
+        g.t_polar += angle;
+
+
+
+        g.i_cart_fp = center.x + g.r_polar * cosf(g.t_polar);
+        g.k_cart_fp = center.z + g.r_polar * sinf(g.t_polar);
+
+        g.u_delta_fp = -this_step_impeller_increment_wa * g.r_polar * sinf(g.t_polar);
+        g.w_delta_fp =  this_step_impeller_increment_wa * g.r_polar * cosf(g.t_polar);
+
+        UpdateCoordinateFraction(g.i_cart_fp, &g.i_cart, &g.i_cart_fraction);
+        UpdateCoordinateFraction(g.k_cart_fp, &g.k_cart, &g.k_cart_fraction);
+
+
+    }
+    return angle;
+
+}
 
 
 
@@ -564,9 +596,9 @@ void Geometry::Init(Grid_Dims _grid, Node_Dims _node, GeometryConfig _tankConfig
     if (node.idj == grid.ngy - 1) upperLimitY -= 1;
 
 
-    center.x = tGeomShape(grid.x) / 2.0f; //center x direction
+    center.x = tGeomShape(grid.x - MDIAM_BORDER) / 2.0f; //center x direction
     center.y = tankConfig.impeller0.impeller_position; //position of impeller, from the top
-    center.z = tGeomShape(grid.z) / 2.0f; //center z direction
+    center.z = tGeomShape(grid.z - MDIAM_BORDER) / 2.0f; //center z direction
 
 
 
@@ -713,8 +745,6 @@ tGeomShape Geometry::Update(Multi_Timer &timer, tStep step, tGeomShape impellerT
 
     return impellerTheta;
 }
-
-
 
 
 

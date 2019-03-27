@@ -2,9 +2,6 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "group:/Users/nile/Workspace/xcode/TD_LB_Base/TD_GeomInput_Rushton_Turbine/rushton_turbine/CMakeLists.txt">
-   </FileRef>
-   <FileRef
       location = "self:">
    </FileRef>
 </Workspace>
