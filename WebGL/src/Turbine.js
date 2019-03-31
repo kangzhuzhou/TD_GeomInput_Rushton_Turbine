@@ -34,18 +34,9 @@ class Turbine extends Component {
       case "reset":
         this.resetViewer();
         break;
-      case "save":
-        this.saveJson();
-        break;
       default:
         break;
     };
-    if (props.transPanXY !== this.props.transPanXY)
-      this.changeTransPan("XY", props.transPanXY);
-    if (props.transPanYZ !== this.props.transPanYZ)
-      this.changeTransPan("YZ", props.transPanYZ);
-    if (props.transPanXZ !== this.props.transPanXZ)
-      this.changeTransPan("XZ", props.transPanXZ);
   }
 
   componentDidMount() {
@@ -54,6 +45,10 @@ class Turbine extends Component {
       alpha: true,
       antialias: true
     });
+    this.glRenderer.shadowMap.enabled = true;
+
+    this.glRenderer.clippingPlanes = Object.freeze( [] ); // GUI sets it to globalPlanes
+    this.glRenderer.localClippingEnabled = true;
     this.glRenderer.animate(() => this.onAnimate());
 
     this.hoverArr = [ "disk", "hub", "shaft", "blade", "baffle"];//"tank",
@@ -61,12 +56,18 @@ class Turbine extends Component {
     this.scene = new THREE.Scene();
 
     this.camera = new THREE.PerspectiveCamera(45, 1, 0.1, 10000);
-    this.camera.position.set(this.props.tankDiameter /2, this.props.tankHeight, this.props.tankDiameter * 3);
+    this.camera.position.set(this.props.tankDiameter /2,
+                            this.props.tankHeight,
+                            this.props.tankDiameter * 3);
     this.scene.add(this.camera);
 
     this.light = new THREE.PointLight(0xffffff, 0.3);
     this.light.position.set(0, 0, this.props.tankDiameter * 3);
     this.scene.add(this.light);
+
+    this.createShadowLight([0, 0, 1]);
+    this.createShadowLight([0, 1, 0]);
+    this.createShadowLight([1, 0, 0]);
 
     // this.controls = new TrackballControls(this.camera, this.refs.painter);
     this.controls = new OrbitControls(this.camera);
@@ -115,20 +116,27 @@ class Turbine extends Component {
       }
     });
 
+    this.transEnableXY = false;
+    this.transEnableYZ = false;
+    this.transEnableXZ = false;
+
     this.createAxis(this.props.tankDiameter, this.props.tankHeight);
-    this.createPlane();
 
     this.createTank();
     this.createShaft();
     this.createDisk();
     this.createHub();
-    this.createTranslucent(this.props.tankDiameter, this.props.tankHeight);
 
     this.blades = [];
     this.changeBladeCount(this.props.bladeCount, 0);
     this.baffles = [];
     this.changeBaffleCount(this.props.baffleCount, 0);
 
+    this.createPlane();
+    this.createTransPlane();
+    this.createTransPan(this.props.tankDiameter, this.props.tankHeight);
+
+    // this.applyTrans();
     this.kernelAngle = 0;
   }
 
@@ -169,6 +177,20 @@ class Turbine extends Component {
       this.changeBaffleCount(nextProps.baffleCount, this.props.baffleCount);
     }
 
+    if (nextProps.transPanXY !== this.props.transPanXY)
+      this.changeTransPan("XY", nextProps.transPanXY);
+    else if (nextProps.transPanYZ !== this.props.transPanYZ)
+      this.changeTransPan("YZ", nextProps.transPanYZ);
+    else if (nextProps.transPanXZ !== this.props.transPanXZ)
+      this.changeTransPan("XZ", nextProps.transPanXZ);
+
+    if (nextProps.transEnableXY !== this.props.transEnableXY)
+      this.changeTransEnable("XY", nextProps.transEnableXY);
+    else if (nextProps.transEnableYZ !== this.props.transEnableYZ)
+      this.changeTransEnable("YZ", nextProps.transEnableYZ);
+    else if (nextProps.transEnableXZ !== this.props.transEnableXZ)
+      this.changeTransEnable("XZ", nextProps.transEnableXZ);
+
     if (!_.isEqual(nextProps, this.props)) {
       this.updatePlane(nextProps);
       this.updateTank(nextProps);
@@ -178,6 +200,7 @@ class Turbine extends Component {
       this.updateBlades(nextProps);
       this.updateBaffles(nextProps);
     }
+    this.applyTrans();
   }
 
   colorFormat() {
@@ -225,8 +248,25 @@ class Turbine extends Component {
     //   )
     // });
     this.controls.update();
-
     this.glRenderer.render(this.scene, this.camera);
+  }
+
+  createShadowLight(dirArr) {
+    var dis = 3000;
+    var dirLight = new THREE.DirectionalLight( 0x55505a, 1 );
+    dirLight.position.set( dis* dirArr[0], dis* dirArr[1], dis* dirArr[2] );
+    dirLight.castShadow = true;
+    dirLight.shadow.camera.near = 1;
+    dirLight.shadow.camera.far = 9000;
+
+    dirLight.shadow.camera.right = 1;
+    dirLight.shadow.camera.left = - 1;
+    dirLight.shadow.camera.top	= 1;
+    dirLight.shadow.camera.bottom = - 1;
+
+    dirLight.shadow.mapSize.width = 1024;
+    dirLight.shadow.mapSize.height = 1024;
+    this.scene.add( dirLight );
   }
 
   createAxisLine(str, dir, color, font, self) {
@@ -294,7 +334,9 @@ class Turbine extends Component {
       color: greyColor,
       opacity: 0.2,
       transparent: true,
-      side: THREE.DoubleSide
+      side: THREE.DoubleSide,
+      clippingPlanes: [],
+      clipShadows: true
     });
     this.tank = new THREE.Mesh(geometry, material);
     this.tank.name = "tank";
@@ -314,7 +356,10 @@ class Turbine extends Component {
   createShaft() {
     var geometry = this.createShaftGeometry(this.props);
     var material = new THREE.MeshPhongMaterial({
-      color: metalColor
+      color: metalColor,
+      side: THREE.DoubleSide,
+      clippingPlanes: [],
+      clipShadows: true
     });
     this.shaft = new THREE.Mesh(geometry, material);
     this.shaft.name = "shaft";
@@ -334,7 +379,10 @@ class Turbine extends Component {
   createDisk() {
     var geometry = this.createDiskGeometry(this.props);
     var material = new THREE.MeshPhongMaterial({
-      color: metalColor
+      color: metalColor,
+      side: THREE.DoubleSide,
+      clippingPlanes: [],
+      clipShadows: true
     });
     this.disk = new THREE.Mesh(geometry, material);
     this.disk.position.set(0, -(this.props.tankHeight / 6), 0);
@@ -356,7 +404,10 @@ class Turbine extends Component {
   createHub() {
     var geometry = this.createHubGeometry(this.props);
     var material = new THREE.MeshPhongMaterial({
-      color: metalColor
+      color: metalColor,
+      side: THREE.DoubleSide,
+      clippingPlanes: [],
+      clipShadows: true
     });
     this.hub = new THREE.Mesh(geometry, material);
     this.hub.position.set(0, -(this.props.tankHeight / 6), 0);
@@ -365,24 +416,34 @@ class Turbine extends Component {
     this.scene.add(this.hub);
   }
 
-  createTranslucent(d, h) {
-    var thickness = 20;
-    this.transPanXY = this.createTranslucentPan([d * 1.1, h * 1.1, thickness]);
-    this.transPanYZ = this.createTranslucentPan([thickness, h * 1.1, d * 1.1]);
-    this.transPanXZ = this.createTranslucentPan([d * 1.1, thickness, d * 1.1]);
-    this.scene.add(this.transPanXY);
-    this.scene.add(this.transPanYZ);
-    this.scene.add(this.transPanXZ);
+  createTransPan(d, h) {
+    var thickness = 5;
+    this.transPanMeshXY = this.createTranslucentPan([d * 1.1, h * 1.1, thickness]);
+    this.transPanMeshYZ = this.createTranslucentPan([thickness, h * 1.1, d * 1.1]);
+    this.transPanMeshXZ = this.createTranslucentPan([d * 1.1, thickness, d * 1.1]);
+    this.scene.add(this.transPanMeshXY);
+    this.scene.add(this.transPanMeshYZ);
+    this.scene.add(this.transPanMeshXZ);
   }
 
   createTranslucentPan(sizeArr) {
     var panGeo = new THREE.BoxGeometry(sizeArr[0], sizeArr[1], sizeArr[2]);
     var panMat = new THREE.MeshPhongMaterial({
           color : 0x0000FF,
+          side: THREE.DoubleSide,
           transparent : true,
           opacity : 0.8
         });
-    return new THREE.Mesh(panGeo, panMat);
+    var panMesh = new THREE.Mesh(panGeo, panMat);
+    panMesh.name = "transPan";
+    panMesh.visible = false;
+    return panMesh;
+  }
+
+  createTransPlane() {
+    this.transPlaneXY = new THREE.Plane( new THREE.Vector3( 0, 0, -1 ), 0 );
+    this.transPlaneYZ = new THREE.Plane( new THREE.Vector3( -1, 0, 0 ), 0 );
+    this.transPlaneXZ = new THREE.Plane( new THREE.Vector3( 0, -1, 0 ), 0 );
   }
 
   updateHub(props) {
@@ -401,8 +462,16 @@ class Turbine extends Component {
       }
     } else if (newValue > oldValue) {
       for (i = oldValue; i < newValue; i++) {
-        var blade = new THREE.BoxGeometry(this.props.bladeWidth, this.props.bladeHeight, this.props.bladeOuterRadius - this.props.bladeInnerRadius);
-        var material = new THREE.MeshPhongMaterial({ color: greyColor });
+        var blade = new THREE.BoxGeometry(
+                        this.props.bladeWidth,
+                        this.props.bladeHeight,
+                        this.props.bladeOuterRadius - this.props.bladeInnerRadius);
+        var material = new THREE.MeshPhongMaterial({
+                color: greyColor,
+                side: THREE.DoubleSide,
+                clippingPlanes: [],
+                clipShadows: true
+              });
         var mesh = new THREE.Mesh(blade, material);
         this.blades.push(mesh);
         mesh.name = "blade";
@@ -448,7 +517,12 @@ class Turbine extends Component {
     } else if (newValue > oldValue) {
       for (i = oldValue; i < newValue; i++) {
         var baffle = this.createBaffleGeometry(this.props);
-        var material = new THREE.MeshPhongMaterial({ color: greyColor });
+        var material = new THREE.MeshPhongMaterial({
+                    color: greyColor,
+                    side: THREE.DoubleSide,
+                    clippingPlanes: [],
+                    clipShadows: true
+                  });
         var mesh = new THREE.Mesh(baffle, material);
         this.baffles.push(mesh);
         mesh.name = "baffle";
@@ -459,9 +533,45 @@ class Turbine extends Component {
   }
 
   changeTransPan(type, value) {
-    if (type == "XY") this.transPanXY.position.z = value;
-    if (type == "YZ") this.transPanYZ.position.x = value;
-    if (type == "XZ") this.transPanXZ.position.y = value;
+    if (type == "XY") {
+      this.transPanMeshXY.position.z = value;
+      this.transPlaneXY.constant = value;
+    } 
+    else if (type == "YZ") {
+      this.transPanMeshYZ.position.x = value;
+      this.transPlaneYZ.constant = value;
+    } 
+    else if (type == "XZ") {
+      this.transPanMeshXZ.position.y = value;
+      this.transPlaneXZ.constant = value; 
+    }
+  }
+
+  changeTransEnable (type, value) {
+    if (type == "XY") 
+      this.transEnableXY = value;
+    else if (type == "YZ")
+      this.transEnableYZ = value;
+    else if (type == "XZ")
+      this.transEnableXZ = value;
+    this.transPanMeshXY.visible = this.transEnableXY;
+    this.transPanMeshYZ.visible = this.transEnableYZ;
+    this.transPanMeshXZ.visible = this.transEnableXZ;
+  }
+
+  applyTrans() {
+    var transArr = [];
+    if (this.transEnableXY) transArr.push(this.transPlaneXY);
+    if (this.transEnableYZ) transArr.push(this.transPlaneYZ);
+    if (this.transEnableXZ) transArr.push(this.transPlaneXZ);
+    this.scene.children.forEach(item => {
+      if (this.hoverArr.indexOf(item.name) > -1) {
+        item.material.clippingPlanes = transArr;
+      }
+      // else if (item.name == "transPan") {
+      //   item.material.clippingPlanes = [this.transPlaneXY, this.transPlaneYZ, this.transPlaneXZ];
+      // }
+    });
   }
 
   updateBaffles(props) {
@@ -491,10 +601,6 @@ class Turbine extends Component {
     this.controls.target.set(0, 0, 0);
   }
 
-  saveJson() {
-    console.log("saveJson");
-  }
-
   render() {
     return (
       <canvas ref="painter" width={this.props.width} height={this.props.height}></canvas>
@@ -522,9 +628,12 @@ Turbine.propTypes = {
   baffleCount: PropTypes.number.isRequired,
   baffleInnerRadius: PropTypes.number.isRequired,
   baffleOuterRadius: PropTypes.number.isRequired,
-  translucentXY: PropTypes.number.isRequired,
-  translucentYZ: PropTypes.number.isRequired,
-  translucentXZ: PropTypes.number.isRequired,
+  transPanXY: PropTypes.number.isRequired,
+  transPanYZ: PropTypes.number.isRequired,
+  transPanXZ: PropTypes.number.isRequired,
+  transEnableXY: PropTypes.bool,
+  transEnableYZ: PropTypes.bool,
+  transEnableXZ: PropTypes.bool,
   baffleWidth: PropTypes.number.isRequired,
   onHoverObject: PropTypes.func
 };

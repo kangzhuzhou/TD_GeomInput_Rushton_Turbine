@@ -30,8 +30,13 @@
 .ant-menu-control:hover {
   color: #fff;
 }
-.ant-menu-item {
-  height: 30px;
+.subMenu .ant-menu-sub.ant-menu-inline > .ant-menu-item{
+  height: 35px;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+.transCheck {
+  padding-right: 10px;
 }
 
 .setting-item {

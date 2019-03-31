@@ -37,15 +37,39 @@ export default class App extends Component {
       transPanXY: 0,
       transPanYZ: 0,
       transPanXZ: 0,
+      transEnableXY: false,
+      transEnableYZ: false,
+      transEnableXZ: false,
       hoverObject: '',
       setting:''
     };
     this.fileReader = new FileReader();
     this.fileReader.onload = (event) => {
       // or do whatever manipulation you want on JSON.parse(event.target.result) here.
+
       var jsonData = JSON.parse(event.target.result);
-      Object.keys(jsonData).forEach(key => {
-        this.setState({ [key]: jsonData[key] });
+      var impeller0 = jsonData.impeller0;
+      var importJsonData = {
+        tankDiameter: jsonData.tankDiameter,
+        tankHeight: jsonData.gridx,
+        shaftRadius: jsonData.shaft.radius,
+        diskRadius: impeller0.disk.radius,
+        diskHeight: impeller0.disk.top,
+        hubRadius: impeller0.hub.radius,
+        hubHeight: impeller0.hub.top,
+        bladeCount: impeller0.numBlades,
+        bladeInnerRadius: impeller0.blades.innerRadius,
+        bladeOuterRadius: impeller0.blades.outerRadius,
+        bladeWidth: impeller0.blades.bladeThickness,
+        bladeHeight: impeller0.blades.top,
+        baffleCount: jsonData.baffles.numBaffles,
+        baffleInnerRadius: jsonData.baffles.innerRadius,
+        baffleOuterRadius: jsonData.baffles.outerRadius,
+        baffleWidth: jsonData.baffles.thickness
+      };
+      console.log(importJsonData);
+      Object.keys(importJsonData).forEach(key => {
+        this.setState({ [key]: importJsonData[key] });
       });
     };
   }
@@ -70,6 +94,12 @@ export default class App extends Component {
 
   handleChange(field, value) {
     this.setState({ [field]: value });
+  }
+  handleTransEnable(field, value) {
+    setTimeout(() => {
+      this.setState({ [field]: value.target.checked });
+    }, 100);
+    
   }
 
   handleAutoRotation(event) {
@@ -101,11 +131,57 @@ export default class App extends Component {
   }
 
   exportJsonFile() {
-    // console.log(this.state);
-    // var jsonData = {name:"ABC", birthday:"1234567"};
+    // kernelAutoRotation={this.state.kernelAutoRotation}
+    // kernelRotationDir={this.state.kernelRotationDir}
+
+    var exportJsonData = {
+          name: "GeometryConfig",
+          gridx: this.state.tankHeight,
+          resolution: "0.699999988",
+          tankDiameter: this.state.tankDiameter,
+          starting_step: 0,
+          impeller_start_angle: 0,
+          impeller_startup_steps_until_normal_speed: 0,
+          baffles: {
+              numBaffles: this.state.baffleCount,
+              firstBaffleOffset: "0.785398185",
+              innerRadius: this.state.baffleInnerRadius,
+              outerRadius: this.state.baffleOuterRadius,
+              thickness: this.state.baffleWidth
+          },
+          numImpellers: "1",
+          impeller0: {
+              numBlades: this.state.bladeCount,
+              firstBladeOffset: 0,
+              uav: "0.100000001",
+              blade_tip_angular_vel_w0: "0.00588235306",
+              impeller_position: this.state.tankDiameter/3,
+              blades: {
+                  innerRadius: this.state.bladeInnerRadius,
+                  outerRadius: this.state.bladeOuterRadius,
+                  bottom: "71.4000015",
+                  top: this.state.bladeHeight,
+                  bladeThickness: this.state.bladeWidth
+              },
+              disk: {
+                  radius: this.state.diskRadius,
+                  bottom: "68.6800003",
+                  top: this.state.diskHeight
+              },
+              hub: {
+                  radius: this.state.hubRadius,
+                  bottom: "71.4000015",
+                  top: this.state.hubHeight
+              }
+          },
+          shaft: {
+              radius: this.state.shaftRadius
+          }
+        };
+    //this.state
     jQuery("<a />", {
       "download": "data.json",
-      "href" : "data:application/json," + encodeURIComponent(JSON.stringify(this.state))
+      "href" : "data:application/json," + encodeURIComponent(JSON.stringify(exportJsonData))
     }).appendTo("body")
     .click(function() {
       jQuery(this).remove()
@@ -145,6 +221,9 @@ export default class App extends Component {
                 transPanXY={this.state.transPanXY}
                 transPanYZ={this.state.transPanYZ}
                 transPanXZ={this.state.transPanXZ}
+                transEnableXY={this.state.transEnableXY}
+                transEnableYZ={this.state.transEnableYZ}
+                transEnableXZ={this.state.transEnableXZ}
                 onHoverObject={name => this.handleHoverObject(name)}
                 setting={this.state.setting}
               />
@@ -153,7 +232,7 @@ export default class App extends Component {
           <Sider width={320} style={{ overflowY: 'auto' }}>
             <div className="logo"></div>
             <Menu theme="dark" mode="inline">
-              <Menu.SubMenu key="tank" title={
+              <Menu.SubMenu className="subMenu" key="tank" title={
                 <span>
                   <Icon type={this.state.hoverObject === 'tank' ? 'environment' : 'mail'} />
                   <span style={{
@@ -170,7 +249,7 @@ export default class App extends Component {
                   <InputNumber size="small" min={100} defaultValue={this.state.tankHeight} onChange={(value) => this.handleChange('tankHeight', value)} />
                 </Menu.Item>
               </Menu.SubMenu>
-              <Menu.SubMenu key="shaft" title={
+              <Menu.SubMenu className="subMenu" key="shaft" title={
                 <span>
                   <Icon type={this.state.hoverObject === 'shaft' ? 'environment' : 'mail'} />
                   <span style={{
@@ -183,7 +262,7 @@ export default class App extends Component {
                   <InputNumber size="small" min={1} defaultValue={this.state.shaftRadius} onChange={(value) => this.handleChange('shaftRadius', value)} />
                 </Menu.Item>
               </Menu.SubMenu>
-              <Menu.SubMenu key="disk" title={
+              <Menu.SubMenu className="subMenu" key="disk" title={
                 <span>
                   <Icon type={this.state.hoverObject === 'disk' ? 'environment' : 'mail'} />
                   <span style={{
@@ -200,7 +279,7 @@ export default class App extends Component {
                   <InputNumber size="small" min={1} defaultValue={this.state.diskHeight} onChange={(value) => this.handleChange('diskHeight', value)} />
                 </Menu.Item>
               </Menu.SubMenu>
-              <Menu.SubMenu key="hub" title={
+              <Menu.SubMenu className="subMenu" key="hub" title={
                 <span>
                   <Icon type={this.state.hoverObject === 'hub' ? 'environment' : 'mail'} />
                   <span style={{
@@ -217,7 +296,7 @@ export default class App extends Component {
                   <InputNumber size="small" min={1} defaultValue={this.state.hubHeight} onChange={(value) => this.handleChange('hubHeight', value)} />
                 </Menu.Item>
               </Menu.SubMenu>
-              <Menu.SubMenu key="blade" title={
+              <Menu.SubMenu className="subMenu" key="blade" title={
                 <span>
                   <Icon type={this.state.hoverObject === 'blade' ? 'environment' : 'mail'} />
                   <span style={{
@@ -261,7 +340,7 @@ export default class App extends Component {
                   </Radio.Group>
                 </Menu.Item>
               </Menu.SubMenu>
-              <Menu.SubMenu key="baffle" title={
+              <Menu.SubMenu className="subMenu" key="baffle" title={
                 <span>
                   <Icon type={this.state.hoverObject === 'baffle' ? 'environment' : 'mail'} />
                   <span style={{
@@ -286,7 +365,7 @@ export default class App extends Component {
                   <InputNumber size="small" min={1} defaultValue={this.state.baffleWidth} onChange={(value) => this.handleChange('baffleWidth', value)} />
                 </Menu.Item>
               </Menu.SubMenu>
-              <Menu.SubMenu className="setting" key="setting" title={
+              <Menu.SubMenu className="setting subMenu" key="setting" title={
                 <span>
                   <Icon type={this.state.hoverObject === 'setting' ? 'environment' : 'mail'} />
                   <span style={{
@@ -305,7 +384,7 @@ export default class App extends Component {
                   <button onClick={this.exportJsonFile.bind(this)}>Save Json</button>
                 </div>
               </Menu.SubMenu>
-              <Menu.SubMenu className="translucent" key="translucent" title={
+              <Menu.SubMenu className="translucent subMenu" key="translucent" title={
                 <span>
                   <Icon type={this.state.hoverObject === 'translucent' ? 'environment' : 'mail'} />
                   <span style={{
@@ -313,16 +392,19 @@ export default class App extends Component {
                   }}>Translucent</span>
                 </span>
               }>
-                <Menu.Item key="menuitem15">
-                  <span className="trans-pan">Translucent XY</span>
+                <Menu.Item className="testClass" key="menuitem15">
+                  <span className="trans-pan">XY Side Enable</span>
+                  <Checkbox className="transCheck" onChange={(value) => this.handleTransEnable('transEnableXY', value)}></Checkbox>
                   <InputNumber size="small" min={this.state.tankDiameter * -0.5} max={this.state.tankDiameter * 0.5} defaultValue={this.state.transPanXY} onChange={(value) => this.handleChange('transPanXY', value)} />
                 </Menu.Item>
                 <Menu.Item key="menuitem16">
-                  <span className="trans-pan">Translucent YZ</span>
+                  <span className="trans-pan">YZ Side Enable</span>
+                  <Checkbox className="transCheck" onChange={(value) => this.handleTransEnable('transEnableYZ', value)}></Checkbox>
                   <InputNumber size="small" min={this.state.tankDiameter * -0.5} max={this.state.tankDiameter * 0.5} defaultValue={this.state.transPanYZ} onChange={(value) => this.handleChange('transPanYZ', value)} />
                 </Menu.Item>
                 <Menu.Item key="menuitem17">
-                  <span className="trans-pan">Translucent XZ</span>
+                  <span className="trans-pan">XZ Side Enable</span>
+                  <Checkbox className="transCheck" onChange={(value) => this.handleTransEnable('transEnableXZ', value)}></Checkbox>
                   <InputNumber size="small" min={this.state.tankHeight * -0.5} max={this.state.tankHeight * 0.5} defaultValue={this.state.transPanXZ} onChange={(value) => this.handleChange('transPanXZ', value)} />
                 </Menu.Item>
               </Menu.SubMenu>
