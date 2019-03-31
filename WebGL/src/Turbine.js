@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import jQuery from 'jquery';
 
 const THREE = require('three');
 // var TrackballControls = require('three-trackballcontrols');
@@ -76,12 +75,6 @@ class Turbine extends Component {
     this.controls.zoomSpeed = 1.2;
     this.controls.panSpeed = 0.8;
 
-    this.controls.noZoom = false;
-    this.controls.noPan = false;
-
-    this.controls.staticMoving = true;
-    this.controls.dynamicDampingFactor = 0.3;
-
     this.controls.keys = [ 65, 83, 68 ];
 
     this.controls.addEventListener('change', () => {
@@ -108,7 +101,7 @@ class Turbine extends Component {
       this.colorFormat();
       if (intersects && intersects.length) {
         intersects.forEach(item => {
-          if (this.hoverArr.indexOf(item.object.name) != -1) {
+          if (this.hoverArr.indexOf(item.object.name) !== -1) {
             item.object.material.color.setHex(0x00FF00);
             this.props.onHoverObject(item.object.name);
           }
@@ -300,7 +293,6 @@ class Turbine extends Component {
     this.scene.add(this.axisGroup);
 
     this.axisSize = Math.max(tankDiameter, tankHeight);
-    this.axisGroup.add(this.axis);
 
     var self = this;
     var fontLoader = new THREE.FontLoader();
@@ -533,26 +525,26 @@ class Turbine extends Component {
   }
 
   changeTransPan(type, value) {
-    if (type == "XY") {
+    if (type === "XY") {
       this.transPanMeshXY.position.z = value;
       this.transPlaneXY.constant = value;
     } 
-    else if (type == "YZ") {
+    else if (type === "YZ") {
       this.transPanMeshYZ.position.x = value;
       this.transPlaneYZ.constant = value;
     } 
-    else if (type == "XZ") {
+    else if (type === "XZ") {
       this.transPanMeshXZ.position.y = value;
       this.transPlaneXZ.constant = value; 
     }
   }
 
   changeTransEnable (type, value) {
-    if (type == "XY") 
+    if (type === "XY") 
       this.transEnableXY = value;
-    else if (type == "YZ")
+    else if (type === "YZ")
       this.transEnableYZ = value;
-    else if (type == "XZ")
+    else if (type === "XZ")
       this.transEnableXZ = value;
     this.transPanMeshXY.visible = this.transEnableXY;
     this.transPanMeshYZ.visible = this.transEnableYZ;
