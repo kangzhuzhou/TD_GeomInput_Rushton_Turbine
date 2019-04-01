@@ -117,19 +117,24 @@ class Turbine extends Component {
 
     this.createTank();
     this.createShaft();
-    this.createDisk();
-    this.createHub();
 
-    this.blades = [];
-    this.changeBladeCount(this.props.bladeCount, 0);
+    this.blades = [[], [], []];
+    var bladeCount;
+    for (let i = 0; i < 3; i++) {
+      this.createHub(i);
+      this.createDisk(i);
+      if      (i === 0) bladeCount = this.props.blade0Count;
+      else if (i === 1) bladeCount = this.props.blade1Count;
+      else if (i === 2) bladeCount = this.props.blade2Count;
+      this.changeBladeCount(bladeCount, 0, i);
+    }
+
     this.baffles = [];
     this.changeBaffleCount(this.props.baffleCount, 0);
 
     this.createPlane();
-    this.createTransPlane();
     this.createTransPan(this.props.tankDiameter, this.props.tankHeight);
 
-    // this.applyTrans();
     this.kernelAngle = 0;
   }
 
@@ -157,15 +162,35 @@ class Turbine extends Component {
       this.stopAutoRotation();
     }
 
-    if (nextProps.bladeCount !== this.props.bladeCount) {
-      this.changeBladeCount(nextProps.bladeCount, this.props.bladeCount);
+    if (nextProps.blade0Count !== this.props.blade0Count) {
+      this.changeBladeCount(nextProps.blade0Count, this.props.blade0Count, 0);
     }
-    if (nextProps.bladeInnerRadius !== this.props.bladeInnerRadius ||
-        nextProps.bladeOuterRadius !== this.props.bladeOuterRadius ||
-        nextProps.bladeWidth !== this.props.bladeWidth ||
-        nextProps.bladeHeight !== this.props.bladeHeight) {
-      this.changeBladeGeometry(nextProps.bladeInnerRadius, nextProps.bladeOuterRadius, nextProps.bladeWidth, nextProps.bladeHeight);
+    else if (nextProps.blade1Count !== this.props.blade1Count) {
+      this.changeBladeCount(nextProps.blade1Count, this.props.blade1Count, 1);
     }
+    else if (nextProps.blade2Count !== this.props.blade2Count) {
+      this.changeBladeCount(nextProps.blade2Count, this.props.blade2Count, 2);
+    }
+
+    if (nextProps.blade0InnerRadius !== this.props.blade0InnerRadius ||
+        nextProps.blade0OuterRadius !== this.props.blade0OuterRadius ||
+        nextProps.blade0Width !== this.props.blade0Width ||
+        nextProps.blade0Height !== this.props.blade0Height) {
+      this.changeBladeGeometry(nextProps.blade0InnerRadius, nextProps.blade0OuterRadius, nextProps.blade0Width, nextProps.blade0Height, 0);
+    }
+    else if (nextProps.blade1InnerRadius !== this.props.blade1InnerRadius ||
+        nextProps.blade1OuterRadius !== this.props.blade1OuterRadius ||
+        nextProps.blade1Width !== this.props.blade1Width ||
+        nextProps.blade1Height !== this.props.blade1Height) {
+      this.changeBladeGeometry(nextProps.blade1InnerRadius, nextProps.blade1OuterRadius, nextProps.blade1Width, nextProps.blade1Height, 1);
+    }
+    else if (nextProps.blade2InnerRadius !== this.props.blade2InnerRadius ||
+        nextProps.blade2OuterRadius !== this.props.blade2OuterRadius ||
+        nextProps.blade2Width !== this.props.blade2Width ||
+        nextProps.blade2Height !== this.props.blade2Height) {
+      this.changeBladeGeometry(nextProps.blade2InnerRadius, nextProps.blade2OuterRadius, nextProps.blade2Width, nextProps.blade2Height, 2);
+    }
+
     if (nextProps.baffleCount !== this.props.baffleCount) {
       this.changeBaffleCount(nextProps.baffleCount, this.props.baffleCount);
     }
@@ -188,12 +213,17 @@ class Turbine extends Component {
       this.updatePlane(nextProps);
       this.updateTank(nextProps);
       this.updateShaft(nextProps);
-      this.updateDisk(nextProps);
-      this.updateHub(nextProps);
-      this.updateBlades(nextProps);
+      var iR, oR;
+      for (let i = 0; i < 3; i++) {
+        this.updateDisk(nextProps, i);
+        this.updateHub(nextProps, i);
+        if      (i === 0) {iR = this.props.blade0InnerRadius; oR = this.props.blade0OuterRadius;}
+        else if (i === 1) {iR = this.props.blade1InnerRadius; oR = this.props.blade1OuterRadius;}
+        else if (i === 2) {iR = this.props.blade2InnerRadius; oR = this.props.blade2OuterRadius;}
+        this.updateBlades(iR, oR, nextProps.tankHeight, i);
+      }
       this.updateBaffles(nextProps);
     }
-    this.applyTrans();
   }
 
   colorFormat() {
@@ -205,15 +235,26 @@ class Turbine extends Component {
   }
 
   startAutoRotation() {
+    var iR, oR, tankHeight = this.props.tankHeight;
     this.timerId = window.setInterval(() => {
       switch (this.props.kernelRotationDir) {
         case 'clockwise':
           this.kernelAngle = (this.kernelAngle + 4) % 360;
-          this.updateBlades(this.props);
+          for (let i = 0; i < 3; i++) {
+            if      (i === 0) {iR = this.props.blade0InnerRadius; oR = this.props.blade0OuterRadius;}
+            else if (i === 1) {iR = this.props.blade1InnerRadius; oR = this.props.blade1OuterRadius;}
+            else if (i === 2) {iR = this.props.blade2InnerRadius; oR = this.props.blade2OuterRadius;}
+            this.updateBlades(iR, oR, tankHeight, i);
+          }
           break;
         case 'counter-clockwise':
           this.kernelAngle = (this.kernelAngle - 4) % 360;
-          this.updateBlades(this.props);
+          for (let i = 0; i < 3; i++) {
+            if      (i === 0) {iR = this.props.blade0InnerRadius; oR = this.props.blade0OuterRadius;}
+            else if (i === 1) {iR = this.props.blade1InnerRadius; oR = this.props.blade1OuterRadius;}
+            else if (i === 2) {iR = this.props.blade2InnerRadius; oR = this.props.blade2OuterRadius;}
+            this.updateBlades(iR, oR, tankHeight, i);
+          }
           break;
         default:
           break;
@@ -298,11 +339,11 @@ class Turbine extends Component {
     var fontLoader = new THREE.FontLoader();
     fontLoader.load('fonts/helvetiker_regular.typeface.json', font => {
       self.createAxisLine("X", [1, 0, 0], 0xFF0000, font, self);
-      self.createAxisLine("Y", [0, 1, 0], 0x00FF00, font, self);
+      self.createAxisLine("Y", [0, -1, 0], 0x00FF00, font, self);
       self.createAxisLine("Z", [0, 0, 1], 0x0000FF, font, self);
     });
 
-    this.axisGroup.position.set(tankDiameter/-2, tankHeight/-2, tankDiameter/-2);
+    this.axisGroup.position.set(tankDiameter/-2, tankHeight/2, tankDiameter/-2);
 
   }
 
@@ -364,52 +405,75 @@ class Turbine extends Component {
     this.shaft.geometry = this.createShaftGeometry(props);
   }
 
-  createDiskGeometry({ diskRadius, diskHeight }) {
+  createDiskGeometry(diskRadius, diskHeight ) {
     return new THREE.CylinderGeometry(diskRadius, diskRadius, diskHeight, 30);
   }
 
-  createDisk() {
-    var geometry = this.createDiskGeometry(this.props);
+  createDisk(num) {
+    var radius, height;
+    if      (num === 0) {radius = this.props.disk0Radius; height = this.props.disk0Height;}
+    else if (num === 1) {radius = this.props.disk1Radius; height = this.props.disk1Height;}
+    else if (num === 2) {radius = this.props.disk2Radius; height = this.props.disk2Height;}
+    var geometry = this.createDiskGeometry(radius, height);
     var material = new THREE.MeshPhongMaterial({
       color: metalColor,
       side: THREE.DoubleSide,
-      clippingPlanes: [],
-      clipShadows: true
+      // clippingPlanes: [],
+      // clipShadows: true
     });
-    this.disk = new THREE.Mesh(geometry, material);
-    this.disk.position.set(0, -(this.props.tankHeight / 6), 0);
-    this.disk.name = "disk";
-    this.disk.originalColor = metalColor;
-    this.scene.add(this.disk);
+    var diskMesh = new THREE.Mesh(geometry, material);
+    var tankHeight = this.props.tankHeight;
+    diskMesh.position.set(0, tankHeight/-2 + tankHeight/4 * (num + 1), 0);
+    diskMesh.name = "disk";
+    diskMesh.originalColor = metalColor;
+    if      (num === 0) this.disk0 = diskMesh;
+    else if (num === 1) this.disk1 = diskMesh;
+    else if (num === 2) this.disk2 = diskMesh;
+    this.scene.add(diskMesh);
   }
 
-  updateDisk(props) {
-    delete this.disk.geometry;
-    this.disk.geometry = this.createDiskGeometry(props);
-    this.disk.position.set(0, -(props.tankHeight / 6), 0);
+  updateDisk(props, num) {
+    var radius, height;
+    if      (num === 0) {radius = props.disk0Radius; height = props.disk0Height;}
+    else if (num === 1) {radius = props.disk1Radius; height = props.disk1Height;}
+    else if (num === 2) {radius = props.disk2Radius; height = props.disk2Height;}
+
+    var diskGeo = this.createDiskGeometry(radius, height);
+    if      (num === 0) {delete this.disk0.geometry; this.disk0.geometry = diskGeo;}
+    else if (num === 1) {delete this.disk1.geometry; this.disk1.geometry = diskGeo;}
+    else if (num === 2) {delete this.disk2.geometry; this.disk2.geometry = diskGeo;}
+    // this.disk.position.set(0, props.tankHeight/-2 + tankHeight/4 * (num + 1) , 0);
   }
 
-  createHubGeometry({ hubRadius, hubHeight }) {
+  createHubGeometry(hubRadius, hubHeight) {
     return new THREE.CylinderGeometry(hubRadius, hubRadius, hubHeight, 30);
   }
 
-  createHub() {
-    var geometry = this.createHubGeometry(this.props);
+  createHub(num) {
+    var radius, height;
+    if      (num === 0) {radius = this.props.hub0Radius; height = this.props.hub0Height;}
+    else if (num === 1) {radius = this.props.hub1Radius; height = this.props.hub1Height;}
+    else if (num === 2) {radius = this.props.hub2Radius; height = this.props.hub2Height;}
+    var geometry = this.createHubGeometry(radius, height);
     var material = new THREE.MeshPhongMaterial({
       color: metalColor,
       side: THREE.DoubleSide,
-      clippingPlanes: [],
-      clipShadows: true
+      // clippingPlanes: [],
+      // clipShadows: true
     });
-    this.hub = new THREE.Mesh(geometry, material);
-    this.hub.position.set(0, -(this.props.tankHeight / 6), 0);
-    this.hub.name = "hub";
-    this.hub.originalColor = metalColor;
-    this.scene.add(this.hub);
+    var hubMesh = new THREE.Mesh(geometry, material);
+    var tankHeight = this.props.tankHeight;
+    hubMesh.position.set(0, tankHeight/-2 + tankHeight/4 * (num + 1), 0);
+    hubMesh.name = "hub" + num;
+    hubMesh.originalColor = metalColor;
+    if      (num === 0) this.hub0 = hubMesh;
+    else if (num === 1) this.hub1 = hubMesh;
+    else if (num === 2) this.hub2 = hubMesh;
+    this.scene.add(hubMesh);
   }
 
   createTransPan(d, h) {
-    var thickness = 5;
+    var thickness = 2;
     this.transPanMeshXY = this.createTranslucentPan([d * 1.1, h * 1.1, thickness]);
     this.transPanMeshYZ = this.createTranslucentPan([thickness, h * 1.1, d * 1.1]);
     this.transPanMeshXZ = this.createTranslucentPan([d * 1.1, thickness, d * 1.1]);
@@ -432,65 +496,68 @@ class Turbine extends Component {
     return panMesh;
   }
 
-  createTransPlane() {
-    this.transPlaneXY = new THREE.Plane( new THREE.Vector3( 0, 0, -1 ), 0 );
-    this.transPlaneYZ = new THREE.Plane( new THREE.Vector3( -1, 0, 0 ), 0 );
-    this.transPlaneXZ = new THREE.Plane( new THREE.Vector3( 0, -1, 0 ), 0 );
+  updateHub(props, num) {
+    var radius, height;
+    if      (num === 0) {radius = props.hub0Radius; height = props.hub0Height;}
+    else if (num === 1) {radius = props.hub1Radius; height = props.hub1Height;}
+    else if (num === 2) {radius = props.hub2Radius; height = props.hub2Height;}
+
+    var hubGeo = this.createHubGeometry(radius, height);
+    if      (num === 0) {delete this.hub0.geometry; this.hub0.geometry = hubGeo;}
+    else if (num === 1) {delete this.hub1.geometry; this.hub1.geometry = hubGeo;}
+    else if (num === 2) {delete this.hub2.geometry; this.hub2.geometry = hubGeo;}
+    // this.hub.position.set(0, -(props.tankHeight / 6), 0);
   }
 
-  updateHub(props) {
-    delete this.hub.geometry;
-    this.hub.geometry = this.createHubGeometry(props);
-    this.hub.position.set(0, -(props.tankHeight / 6), 0);
-  }
-
-  changeBladeCount(newValue, oldValue) {
+  changeBladeCount(newValue, oldValue, num) {
+    console.log(newValue, oldValue);
     var i;
     if (newValue < oldValue) {
       for (i = oldValue - 1; i >= newValue; i--) {
-        this.scene.remove(this.blades[i]);
-        this.blades.pop();
-        delete this.blades[i];
+        this.scene.remove(this.blades[num][i]);
+        this.blades[num].pop();
+        delete this.blades[num][i];
       }
     } else if (newValue > oldValue) {
+      var w, h, iR, oR;
+      if      (num === 0) {w = this.props.blade0Width; h = this.props.blade0Height; iR = this.props.blade0InnerRadius; oR = this.props.blade0OuterRadius;}
+      else if (num === 1) {w = this.props.blade1Width; h = this.props.blade1Height; iR = this.props.blade1InnerRadius; oR = this.props.blade1OuterRadius;}
+      else if (num === 2) {w = this.props.blade2Width; h = this.props.blade2Height; iR = this.props.blade2InnerRadius; oR = this.props.blade2OuterRadius;}
       for (i = oldValue; i < newValue; i++) {
-        var blade = new THREE.BoxGeometry(
-                        this.props.bladeWidth,
-                        this.props.bladeHeight,
-                        this.props.bladeOuterRadius - this.props.bladeInnerRadius);
+        var blade = new THREE.BoxGeometry(w, h, oR - iR);
         var material = new THREE.MeshPhongMaterial({
                 color: greyColor,
                 side: THREE.DoubleSide,
-                clippingPlanes: [],
-                clipShadows: true
+                // clippingPlanes: [],
+                // clipShadows: true
               });
         var mesh = new THREE.Mesh(blade, material);
-        this.blades.push(mesh);
-        mesh.name = "blade";
+        this.blades[num].push(mesh);
+        mesh.name = "blade"+num;
         mesh.originalColor = greyColor;
         this.scene.add(mesh);
       }
     }
   }
 
-  changeBladeGeometry(innerRadius, outerRadius, width, height) {
-    for (var i = 0; i < this.blades.length; i++) {
-      delete this.blades[i].geometry;
-      this.blades[i].geometry = new THREE.BoxGeometry(width, height, outerRadius - innerRadius);
+  changeBladeGeometry(innerRadius, outerRadius, width, height, num) {
+    for (var i = 0; i < this.blades[num].length; i++) {
+      delete this.blades[num][i].geometry;
+      this.blades[num][i].geometry = new THREE.BoxGeometry(width, height, outerRadius - innerRadius);
     }
   }
 
-  updateBlades({ bladeInnerRadius, bladeOuterRadius, tankHeight }) {
+  updateBlades(bladeInnerRadius, bladeOuterRadius, tankHeight, num ) {
     var distance = (bladeInnerRadius + bladeOuterRadius) / 2;
     var yAxis = new THREE.Vector3(0, 1, 0);
-    var offset = new THREE.Vector3(0, -(tankHeight / 6), 0);
-    for (var i = 0; i < this.blades.length; i++) {
-      var angle = (360 * i / this.blades.length + this.kernelAngle) % 360;
+    var offset = new THREE.Vector3(0, tankHeight/-2 + tankHeight/4 * (num + 1), 0);
+    for (var i = 0; i < this.blades[num].length; i++) {
+      var angle = (360 * i / this.blades[num].length + this.kernelAngle) % 360;
       angle = 2 * Math.PI * angle / 360;
-      this.blades[i].position.set(0, 0, distance);
-      this.blades[i].position.applyAxisAngle(yAxis, angle);
-      this.blades[i].position.add(offset);
-      this.blades[i].rotation.set(0, angle, 0);
+      this.blades[num][i].position.set(0, 0, distance);
+      this.blades[num][i].position.applyAxisAngle(yAxis, angle);
+      this.blades[num][i].position.add(offset);
+      this.blades[num][i].rotation.set(0, angle, 0);
     }
   }
 
@@ -512,8 +579,8 @@ class Turbine extends Component {
         var material = new THREE.MeshPhongMaterial({
                     color: greyColor,
                     side: THREE.DoubleSide,
-                    clippingPlanes: [],
-                    clipShadows: true
+                    // clippingPlanes: [],
+                    // clipShadows: true
                   });
         var mesh = new THREE.Mesh(baffle, material);
         this.baffles.push(mesh);
@@ -527,15 +594,12 @@ class Turbine extends Component {
   changeTransPan(type, value) {
     if (type === "XY") {
       this.transPanMeshXY.position.z = value;
-      this.transPlaneXY.constant = value;
     } 
     else if (type === "YZ") {
       this.transPanMeshYZ.position.x = value;
-      this.transPlaneYZ.constant = value;
     } 
     else if (type === "XZ") {
       this.transPanMeshXZ.position.y = value;
-      this.transPlaneXZ.constant = value; 
     }
   }
 
@@ -549,21 +613,6 @@ class Turbine extends Component {
     this.transPanMeshXY.visible = this.transEnableXY;
     this.transPanMeshYZ.visible = this.transEnableYZ;
     this.transPanMeshXZ.visible = this.transEnableXZ;
-  }
-
-  applyTrans() {
-    var transArr = [];
-    if (this.transEnableXY) transArr.push(this.transPlaneXY);
-    if (this.transEnableYZ) transArr.push(this.transPlaneYZ);
-    if (this.transEnableXZ) transArr.push(this.transPlaneXZ);
-    this.scene.children.forEach(item => {
-      if (this.hoverArr.indexOf(item.name) > -1) {
-        item.material.clippingPlanes = transArr;
-      }
-      // else if (item.name == "transPan") {
-      //   item.material.clippingPlanes = [this.transPlaneXY, this.transPlaneYZ, this.transPlaneXZ];
-      // }
-    });
   }
 
   updateBaffles(props) {
@@ -608,18 +657,40 @@ Turbine.propTypes = {
   shaftRadius: PropTypes.number.isRequired,
   kernelAutoRotation: PropTypes.bool,
   kernelRotationDir: PropTypes.string,
-  diskRadius: PropTypes.number.isRequired,
-  diskHeight: PropTypes.number.isRequired,
-  hubRadius: PropTypes.number.isRequired,
-  hubHeight: PropTypes.number.isRequired,
-  bladeCount: PropTypes.number.isRequired,
-  bladeInnerRadius: PropTypes.number.isRequired,
-  bladeOuterRadius: PropTypes.number.isRequired,
-  bladeWidth: PropTypes.number.isRequired,
-  bladeHeight: PropTypes.number.isRequired,
   baffleCount: PropTypes.number.isRequired,
   baffleInnerRadius: PropTypes.number.isRequired,
   baffleOuterRadius: PropTypes.number.isRequired,
+
+  hub0Radius: PropTypes.number.isRequired,
+  hub0Height: PropTypes.number.isRequired,
+  disk0Radius: PropTypes.number.isRequired,
+  disk0Height: PropTypes.number.isRequired,
+  blade0Count: PropTypes.number.isRequired,
+  blade0InnerRadius: PropTypes.number.isRequired,
+  blade0OuterRadius: PropTypes.number.isRequired,
+  blade0Width: PropTypes.number.isRequired,
+  blade0Height: PropTypes.number.isRequired,
+
+  hub1Radius: PropTypes.number.isRequired,
+  hub1Height: PropTypes.number.isRequired,
+  disk1Radius: PropTypes.number.isRequired,
+  disk1Height: PropTypes.number.isRequired,
+  blade1Count: PropTypes.number.isRequired,
+  blade1InnerRadius: PropTypes.number.isRequired,
+  blade1OuterRadius: PropTypes.number.isRequired,
+  blade1Width: PropTypes.number.isRequired,
+  blade1Height: PropTypes.number.isRequired,
+
+  hub2Radius: PropTypes.number.isRequired,
+  hub2Height: PropTypes.number.isRequired,
+  disk2Radius: PropTypes.number.isRequired,
+  disk2Height: PropTypes.number.isRequired,
+  blade2Count: PropTypes.number.isRequired,
+  blade2InnerRadius: PropTypes.number.isRequired,
+  blade2OuterRadius: PropTypes.number.isRequired,
+  blade2Width: PropTypes.number.isRequired,
+  blade2Height: PropTypes.number.isRequired,
+
   transPanXY: PropTypes.number.isRequired,
   transPanYZ: PropTypes.number.isRequired,
   transPanXZ: PropTypes.number.isRequired,
