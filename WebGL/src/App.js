@@ -27,15 +27,15 @@ export default class App extends Component {
       baffleWidth: unit / 75,
 
       impellerCount: 3,
-      hubRadius: unit * 4 / 75,
-      hubHeight: unit / 15,
-      diskRadius: unit / 8,
-      diskHeight: unit / 75,
-      bladeCount: 6,
-      bladeInnerRadius: unit / 12,
-      bladeOuterRadius: unit / 6,
-      bladeWidth: unit / 75,
-      bladeHeight: unit / 15,
+      hubRadius: [unit * 4 / 75, unit * 4 / 75, unit * 4 / 75],
+      hubHeight: [unit / 15, unit / 15, unit / 15],
+      diskRadius: [unit / 8, unit / 8, unit / 8],
+      diskHeight: [unit / 75, unit / 75, unit / 75],
+      bladeCount: [6, 6, 6],
+      bladeInnerRadius: [unit / 12, unit / 12, unit / 12],
+      bladeOuterRadius: [unit / 6, unit / 6, unit / 6],
+      bladeWidth: [unit / 75, unit / 75, unit / 75],
+      bladeHeight: [unit / 15, unit / 15, unit / 15],
 
       transPanXY: 0,
       transPanYZ: 0,
@@ -51,6 +51,33 @@ export default class App extends Component {
       // or do whatever manipulation you want on JSON.parse(event.target.result) here.
 
       var jsonData = JSON.parse(event.target.result);
+
+      var hubRadius = [];
+      var hubHeight = [];
+      var diskRadius = [];
+      var diskHeight = [];
+      var bladeCount = [];
+      var bladeInnerRadius = [];
+      var bladeOuterRadius = [];
+      var bladeWidth = [];
+      var bladeHeight = [];
+
+      var keyArr = Object.keys(jsonData);
+  
+      keyArr.forEach(key => {
+        if (key.indexOf("impeller") > -1) {
+          var idx = parseInt(key.substring(8));
+          hubRadius[idx] = jsonData[key].hub.radius;
+          hubHeight[idx] = jsonData[key].hub.top
+          diskRadius[idx] = jsonData[key].disk.radius;
+          diskHeight[idx] = jsonData[key].disk.top;
+          bladeCount[idx] = jsonData[key].numBlades;
+          bladeInnerRadius[idx] = jsonData[key].blades.innerRadius;
+          bladeOuterRadius[idx] = jsonData[key].blades.outerRadius;
+          bladeWidth[idx] = jsonData[key].blades.bladeThickness;
+          bladeHeight[idx] = jsonData[key].blades.top;
+        }
+      });
       var impeller0 = jsonData.impeller0;
       var importJsonData = {
         tankDiameter: jsonData.tankDiameter,
@@ -62,15 +89,15 @@ export default class App extends Component {
         baffleWidth: jsonData.baffles.thickness,
 
         impellerCount : jsonData.numImpellers,
-        hubRadius: impeller0.hub.radius,
-        hubHeight: impeller0.hub.top,
-        diskRadius: impeller0.disk.radius,
-        diskHeight: impeller0.disk.top,
-        bladeCount: impeller0.numBlades,
-        bladeInnerRadius: impeller0.blades.innerRadius,
-        bladeOuterRadius: impeller0.blades.outerRadius,
-        bladeWidth: impeller0.blades.bladeThickness,
-        bladeHeight: impeller0.blades.top,
+        hubRadius: hubRadius,
+        hubHeight: hubHeight,
+        diskRadius: diskRadius,
+        diskHeight: diskHeight,
+        bladeCount: bladeCount,
+        bladeInnerRadius: bladeInnerRadius,
+        bladeOuterRadius: bladeOuterRadius,
+        bladeWidth: bladeWidth,
+        bladeHeight: bladeHeight,
       };
       console.log(importJsonData);
       Object.keys(importJsonData).forEach(key => {
@@ -99,6 +126,15 @@ export default class App extends Component {
 
   handleChange(field, value) {
     this.setState({ [field]: value });
+  }
+  handleImpellerChange(field, value, num) {
+    const updatedInfo = this.state[field].map((item, idx) => {
+      if(idx === num) {
+        item = value;
+      }
+      return item;
+    })
+    this.setState({[field]: updatedInfo});
   }
   handleTransEnable(field, value) {
     setTimeout(() => {
@@ -138,52 +174,55 @@ export default class App extends Component {
   exportJsonFile() {
     // kernelAutoRotation={this.state.kernelAutoRotation}
     // kernelRotationDir={this.state.kernelRotationDir}
-
     var exportJsonData = {
-          name: "GeometryConfig",
-          gridx: this.state.tankHeight,
-          resolution: "0.699999988",
-          tankDiameter: this.state.tankDiameter,
-          starting_step: 0,
-          impeller_start_angle: 0,
-          impeller_startup_steps_until_normal_speed: 0,
-          baffles: {
-              numBaffles: this.state.baffleCount,
-              firstBaffleOffset: "0.785398185",
-              innerRadius: this.state.baffleInnerRadius,
-              outerRadius: this.state.baffleOuterRadius,
-              thickness: this.state.baffleWidth
-          },
-          numImpellers: this.state.impellerCount,
-          impeller0: {
-              numBlades: this.state.bladeCount,
-              firstBladeOffset: 0,
-              uav: "0.100000001",
-              blade_tip_angular_vel_w0: "0.00588235306",
-              impeller_position: this.state.tankDiameter/4,
-              blades: {
-                  innerRadius: this.state.bladeInnerRadius,
-                  outerRadius: this.state.bladeOuterRadius,
-                  bottom: "71.4000015",
-                  top: this.state.bladeHeight,
-                  bladeThickness: this.state.bladeWidth
-              },
-              disk: {
-                  radius: this.state.diskRadius,
-                  bottom: "68.6800003",
-                  top: this.state.diskHeight
-              },
-              hub: {
-                  radius: this.state.hubRadius,
-                  bottom: "71.4000015",
-                  top: this.state.hubHeight
-              }
-          },
-          shaft: {
-              radius: this.state.shaftRadius
-          }
-        };
-    //this.state
+      name: "GeometryConfig",
+      gridx: this.state.tankHeight,
+      resolution: "0.699999988",
+      tankDiameter: this.state.tankDiameter,
+      starting_step: 0,
+      impeller_start_angle: 0,
+      impeller_startup_steps_until_normal_speed: 0,
+      baffles: {
+          numBaffles: this.state.baffleCount,
+          firstBaffleOffset: "0.785398185",
+          innerRadius: this.state.baffleInnerRadius,
+          outerRadius: this.state.baffleOuterRadius,
+          thickness: this.state.baffleWidth
+      },
+      numImpellers: this.state.impellerCount,
+      shaft: {
+          radius: this.state.shaftRadius
+      }
+    };
+
+    for (let i = 0; i < this.state.impellerCount; i++) {
+      var keyStr = "impeller"+i;
+      exportJsonData[keyStr] = {
+        numBlades: this.state.bladeCount[i],
+        firstBladeOffset: 0,
+        uav: "0.100000001",
+        blade_tip_angular_vel_w0: "0.00588235306",
+        impeller_position: this.state.tankDiameter/(this.state.impellerCount + 1) * (i + 1),
+        blades: {
+            innerRadius: this.state.bladeInnerRadius[i],
+            outerRadius: this.state.bladeOuterRadius[i],
+            bottom: "71.4000015",
+            top: this.state.bladeHeight[i],
+            bladeThickness: this.state.bladeWidth[i]
+        },
+        disk: {
+            radius: this.state.diskRadius[i],
+            bottom: "68.6800003",
+            top: this.state.diskHeight[i]
+        },
+        hub: {
+            radius: this.state.hubRadius[i],
+            bottom: "71.4000015",
+            top: this.state.hubHeight[i]
+        }
+      }
+    }
+
     jQuery("<a />", {
       "download": "data.json",
       "href" : "data:application/json," + encodeURIComponent(JSON.stringify(exportJsonData))
@@ -289,7 +328,6 @@ export default class App extends Component {
                   <InputNumber size="small" min={1} defaultValue={this.state.baffleWidth} onChange={(value) => this.handleChange('baffleWidth', value)} />
                 </Menu.Item>
               </Menu.SubMenu>
-
               <Menu.SubMenu className="subMenu" key="impellers" title={
                 <span><Icon type={'mail'} /><span>Impeller Count</span></span>
               }>
@@ -299,62 +337,69 @@ export default class App extends Component {
                 </Menu.Item>
               </Menu.SubMenu>
 
-              <Menu.SubMenu className="subMenu" key="hub" title={
-                <span>
-                  <Icon type={this.state.hoverObject === 'hub' ? 'environment' : 'mail'} />
-                  <span style={{fontWeight: this.state.hoverObject === 'hub' ? 'bold' : 'normal'}}>Hub</span>
-                </span>
+              {[...Array(this.state.impellerCount)].map((val, idx) => {
+                return (
+                  <Menu.SubMenu className="subMenu" key={`impeller-${idx}`} title={
+                    <span><Icon type={'mail'} /><span>Impeller {idx + 1}</span></span>
+                  }>
+
+                    <Menu.SubMenu className="subMenu" key={`hub-${idx}`} title={
+                      <span><Icon type={'mail'} /><span>Hub</span></span>
+                    }>
+                      <Menu.Item key={`hubRadius-${idx}`}>
+                        <span>Radius</span>
+                        <InputNumber size="small" min={1} defaultValue={this.state.hubRadius[0]} onChange={(value) => this.handleImpellerChange('hubRadius', value, idx)} />
+                      </Menu.Item>
+                      <Menu.Item key={`hubHeight-${idx}`}>
+                        <span>Height</span>
+                        <InputNumber size="small" min={1} defaultValue={this.state.hubHeight[0]} onChange={(value) => this.handleImpellerChange('hubHeight', value, idx)} />
+                      </Menu.Item>
+                    </Menu.SubMenu>
+                    <Menu.SubMenu className="subMenu" key={`disk-${idx}`} title={
+                      <span><Icon type={'mail'} /><span>Disk</span></span>
+                    }>
+                      <Menu.Item key={`diskRadius-${idx}`}>
+                        <span>Radius</span>
+                        <InputNumber size="small" min={1} defaultValue={this.state.diskRadius[0]} onChange={(value) => this.handleImpellerChange('diskRadius', value, idx)} />
+                      </Menu.Item>
+                      <Menu.Item key={`diskHeight-${idx}`}>
+                        <span>Height</span>
+                        <InputNumber size="small" min={1} defaultValue={this.state.diskHeight[0]} onChange={(value) => this.handleImpellerChange('diskHeight', value, idx)} />
+                      </Menu.Item>
+                    </Menu.SubMenu>
+                    <Menu.SubMenu className="subMenu" key={`blade-${idx}`} title={
+                      <span><Icon type={'mail'} /><span>Blade</span>
+                      </span>
+                    }>
+                      <Menu.Item key={`bladeCount-${idx}`}>
+                        <span>Count</span>
+                        <InputNumber size="small" min={1} defaultValue={this.state.bladeCount[0]} onChange={(value) => this.handleImpellerChange('bladeCount', value, idx)} />
+                      </Menu.Item>
+                      <Menu.Item key={`bladeInnerRadius-${idx}`}>
+                        <span>Inner Radius</span>
+                        <InputNumber size="small" min={1} defaultValue={this.state.bladeInnerRadius[0]} onChange={(value) => this.handleImpellerChange('bladeInnerRadius', value, idx)} />
+                      </Menu.Item>
+                      <Menu.Item key={`bladeOuterRadius-${idx}`}>
+                        <span>Outer Radius</span>
+                        <InputNumber size="small" min={1} defaultValue={this.state.bladeOuterRadius[0]} onChange={(value) => this.handleImpellerChange('bladeOuterRadius', value, idx)} />
+                      </Menu.Item>
+                      <Menu.Item key={`bladeWidth-${idx}`}>
+                        <span>Width</span>
+                        <InputNumber size="small" min={1} defaultValue={this.state.bladeWidth[0]} onChange={(value) => this.handleImpellerChange('bladeWidth', value, idx)} />
+                      </Menu.Item>
+                      <Menu.Item key={`bladeHeight-${idx}`}>
+                        <span>Height</span>
+                        <InputNumber size="small" min={1} defaultValue={this.state.bladeHeight[0]} onChange={(value) => this.handleImpellerChange('bladeHeight', value, idx)} />
+                      </Menu.Item>
+                    </Menu.SubMenu>
+
+                  </Menu.SubMenu>
+                )
+              })}
+
+              <Menu.SubMenu className="subMenu" key="autoRotate" title={
+                <span><Icon type={'mail'} /><span>Auto Rotate</span></span>
               }>
-                <Menu.Item key="hubRadius">
-                  <span>Radius</span>
-                  <InputNumber size="small" min={1} defaultValue={this.state.hubRadius} onChange={(value) => this.handleChange('hubRadius', value)} />
-                </Menu.Item>
-                <Menu.Item key="hubHeight">
-                  <span>Height</span>
-                  <InputNumber size="small" min={1} defaultValue={this.state.hubHeight} onChange={(value) => this.handleChange('hubHeight', value)} />
-                </Menu.Item>
-              </Menu.SubMenu>
-              <Menu.SubMenu className="subMenu" key="disk" title={
-                <span>
-                  <Icon type={this.state.hoverObject === 'disk' ? 'environment' : 'mail'} />
-                  <span style={{fontWeight: this.state.hoverObject === 'disk' ? 'bold' : 'normal'}}>Disk</span>
-                </span>
-              }>
-                <Menu.Item key="diskRadius">
-                  <span>Radius</span>
-                  <InputNumber size="small" min={1} defaultValue={this.state.diskRadius} onChange={(value) => this.handleChange('diskRadius', value)} />
-                </Menu.Item>
-                <Menu.Item key="diskHeight">
-                  <span>Height</span>
-                  <InputNumber size="small" min={1} defaultValue={this.state.diskHeight} onChange={(value) => this.handleChange('diskHeight', value)} />
-                </Menu.Item>
-              </Menu.SubMenu>
-              <Menu.SubMenu className="subMenu" key="blade" title={
-                <span>
-                  <Icon type={this.state.hoverObject === 'blade' ? 'environment' : 'mail'} />
-                  <span style={{fontWeight: this.state.hoverObject === 'blade' ? 'bold' : 'normal'}}>Blade</span>
-                </span>
-              }>
-                <Menu.Item key="bladeCount">
-                  <span>Count</span>
-                  <InputNumber size="small" min={1} defaultValue={this.state.bladeCount} onChange={(value) => this.handleChange('bladeCount', value)} />
-                </Menu.Item>
-                <Menu.Item key="bladeInnerRadius">
-                  <span>Inner Radius</span>
-                  <InputNumber size="small" min={1} defaultValue={this.state.bladeInnerRadius} onChange={(value) => this.handleChange('bladeInnerRadius', value)} />
-                </Menu.Item>
-                <Menu.Item key="bladeOuterRadius">
-                  <span>Outer Radius</span>
-                  <InputNumber size="small" min={1} defaultValue={this.state.bladeOuterRadius} onChange={(value) => this.handleChange('bladeOuterRadius', value)} />
-                </Menu.Item>
-                <Menu.Item key="bladeWidth">
-                  <span>Width</span>
-                  <InputNumber size="small" min={1} defaultValue={this.state.bladeWidth} onChange={(value) => this.handleChange('bladeWidth', value)} />
-                </Menu.Item>
-                <Menu.Item key="bladeHeight">
-                  <span>Height</span>
-                  <InputNumber size="small" min={1} defaultValue={this.state.bladeHeight} onChange={(value) => this.handleChange('bladeHeight', value)} />
-                </Menu.Item>
                 <Menu.Item key="bladeAutoRotate">
                   <Checkbox checked={this.state.kernelAutoRotation} onChange={this.handleAutoRotation.bind(this)}>
                     <span className="ant-menu-control">Auto Rotation</span>
@@ -371,6 +416,7 @@ export default class App extends Component {
                   </Radio.Group>
                 </Menu.Item>
               </Menu.SubMenu>
+
 
               <Menu.SubMenu className="setting subMenu" key="setting" title={
                 <span>
