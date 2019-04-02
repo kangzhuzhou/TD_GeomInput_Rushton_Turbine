@@ -25,35 +25,17 @@ export default class App extends Component {
       baffleInnerRadius: unit * 2 / 5,
       baffleOuterRadius: unit / 2,
       baffleWidth: unit / 75,
-      hub0Radius: unit * 4 / 75,
-      hub0Height: unit / 15,
-      disk0Radius: unit / 8,
-      disk0Height: unit / 75,
-      blade0Count: 6,
-      blade0InnerRadius: unit / 12,
-      blade0OuterRadius: unit / 6,
-      blade0Width: unit / 75,
-      blade0Height: unit / 15,
 
-      hub1Radius: unit * 4 / 75,
-      hub1Height: unit / 15,
-      disk1Radius: unit / 8,
-      disk1Height: unit / 75,
-      blade1Count: 6,
-      blade1InnerRadius: unit / 12,
-      blade1OuterRadius: unit / 6,
-      blade1Width: unit / 75,
-      blade1Height: unit / 15,
-
-      hub2Radius: unit * 4 / 75,
-      hub2Height: unit / 15,
-      disk2Radius: unit / 8,
-      disk2Height: unit / 75,
-      blade2Count: 6,
-      blade2InnerRadius: unit / 12,
-      blade2OuterRadius: unit / 6,
-      blade2Width: unit / 75,
-      blade2Height: unit / 15,
+      impellerCount: 3,
+      hubRadius: unit * 4 / 75,
+      hubHeight: unit / 15,
+      diskRadius: unit / 8,
+      diskHeight: unit / 75,
+      bladeCount: 6,
+      bladeInnerRadius: unit / 12,
+      bladeOuterRadius: unit / 6,
+      bladeWidth: unit / 75,
+      bladeHeight: unit / 15,
 
       transPanXY: 0,
       transPanYZ: 0,
@@ -70,10 +52,6 @@ export default class App extends Component {
 
       var jsonData = JSON.parse(event.target.result);
       var impeller0 = jsonData.impeller0;
-      var impeller1 = jsonData.impeller1;
-      var impeller2 = jsonData.impeller2;
-      if (!impeller1) impeller1 = impeller0;
-      if (!impeller2) impeller2 = impeller0;
       var importJsonData = {
         tankDiameter: jsonData.tankDiameter,
         tankHeight: jsonData.gridx,
@@ -83,35 +61,16 @@ export default class App extends Component {
         baffleOuterRadius: jsonData.baffles.outerRadius,
         baffleWidth: jsonData.baffles.thickness,
 
-        hub0Radius: impeller0.hub.radius,
-        hub0Height: impeller0.hub.top,
-        disk0Radius: impeller0.disk.radius,
-        disk0Height: impeller0.disk.top,
-        blade0Count: impeller0.numBlades,
-        blade0InnerRadius: impeller0.blades.innerRadius,
-        blade0OuterRadius: impeller0.blades.outerRadius,
-        blade0Width: impeller0.blades.bladeThickness,
-        blade0Height: impeller0.blades.top,
-
-        hub1Radius: impeller1.hub.radius,
-        hub1Height: impeller1.hub.top,
-        disk1Radius: impeller1.disk.radius,
-        disk1Height: impeller1.disk.top,
-        blade1Count: impeller1.numBlades,
-        blade1InnerRadius: impeller1.blades.innerRadius,
-        blade1OuterRadius: impeller1.blades.outerRadius,
-        blade1Width: impeller1.blades.bladeThickness,
-        blade1Height: impeller1.blades.top,
-
-        hub2Radius: impeller2.hub.radius,
-        hub2Height: impeller2.hub.top,
-        disk2Radius: impeller2.disk.radius,
-        disk2Height: impeller2.disk.top,
-        blade2Count: impeller2.numBlades,
-        blade2InnerRadius: impeller2.blades.innerRadius,
-        blade2OuterRadius: impeller2.blades.outerRadius,
-        blade2Width: impeller2.blades.bladeThickness,
-        blade2Height: impeller2.blades.top
+        impellerCount : jsonData.numImpellers,
+        hubRadius: impeller0.hub.radius,
+        hubHeight: impeller0.hub.top,
+        diskRadius: impeller0.disk.radius,
+        diskHeight: impeller0.disk.top,
+        bladeCount: impeller0.numBlades,
+        bladeInnerRadius: impeller0.blades.innerRadius,
+        bladeOuterRadius: impeller0.blades.outerRadius,
+        bladeWidth: impeller0.blades.bladeThickness,
+        bladeHeight: impeller0.blades.top,
       };
       console.log(importJsonData);
       Object.keys(importJsonData).forEach(key => {
@@ -195,78 +154,30 @@ export default class App extends Component {
               outerRadius: this.state.baffleOuterRadius,
               thickness: this.state.baffleWidth
           },
-          numImpellers: "1",
+          numImpellers: this.state.impellerCount,
           impeller0: {
-              numBlades: this.state.blade0Count,
+              numBlades: this.state.bladeCount,
               firstBladeOffset: 0,
               uav: "0.100000001",
               blade_tip_angular_vel_w0: "0.00588235306",
               impeller_position: this.state.tankDiameter/4,
               blades: {
-                  innerRadius: this.state.blade0InnerRadius,
-                  outerRadius: this.state.blade0OuterRadius,
+                  innerRadius: this.state.bladeInnerRadius,
+                  outerRadius: this.state.bladeOuterRadius,
                   bottom: "71.4000015",
-                  top: this.state.blade0Height,
-                  bladeThickness: this.state.blade0Width
+                  top: this.state.bladeHeight,
+                  bladeThickness: this.state.bladeWidth
               },
               disk: {
-                  radius: this.state.disk0Radius,
+                  radius: this.state.diskRadius,
                   bottom: "68.6800003",
-                  top: this.state.disk0Height
+                  top: this.state.diskHeight
               },
               hub: {
-                  radius: this.state.hub0Radius,
+                  radius: this.state.hubRadius,
                   bottom: "71.4000015",
-                  top: this.state.hub0Height
+                  top: this.state.hubHeight
               }
-          },
-          impeller1: {
-            numBlades: this.state.blade1Count,
-            firstBladeOffset: 0,
-            uav: "0.100000001",
-            blade_tip_angular_vel_w0: "0.00588235306",
-            impeller_position: this.state.tankDiameter/2,
-            blades: {
-                innerRadius: this.state.blade1InnerRadius,
-                outerRadius: this.state.blade1OuterRadius,
-                bottom: "71.4000015",
-                top: this.state.blade1Height,
-                bladeThickness: this.state.blade1Width
-            },
-            disk: {
-                radius: this.state.disk1Radius,
-                bottom: "68.6800003",
-                top: this.state.disk1Height
-            },
-            hub: {
-                radius: this.state.hub1Radius,
-                bottom: "71.4000015",
-                top: this.state.hub1Height
-            }
-          },
-          impeller2: {
-            numBlades: this.state.blade2Count,
-            firstBladeOffset: 0,
-            uav: "0.100000001",
-            blade_tip_angular_vel_w0: "0.00588235306",
-            impeller_position: this.state.tankDiameter*3/4,
-            blades: {
-                innerRadius: this.state.blade2InnerRadius,
-                outerRadius: this.state.blade2OuterRadius,
-                bottom: "71.4000015",
-                top: this.state.blade2Height,
-                bladeThickness: this.state.blade2Width
-            },
-            disk: {
-                radius: this.state.disk2Radius,
-                bottom: "68.6800003",
-                top: this.state.disk2Height
-            },
-            hub: {
-                radius: this.state.hub2Radius,
-                bottom: "71.4000015",
-                top: this.state.hub2Height
-            }
           },
           shaft: {
               radius: this.state.shaftRadius
@@ -304,35 +215,16 @@ export default class App extends Component {
                 baffleOuterRadius={this.state.baffleOuterRadius}
                 baffleWidth={this.state.baffleWidth}
 
-                hub0Radius={this.state.hub0Radius}
-                hub0Height={this.state.hub0Height}
-                disk0Radius={this.state.disk0Radius}
-                disk0Height={this.state.disk0Height}
-                blade0Count={this.state.blade0Count}
-                blade0InnerRadius={this.state.blade0InnerRadius}
-                blade0OuterRadius={this.state.blade0OuterRadius}
-                blade0Width={this.state.blade0Width}
-                blade0Height={this.state.blade0Height}
-
-                hub1Radius={this.state.hub1Radius}
-                hub1Height={this.state.hub1Height}
-                disk1Radius={this.state.disk1Radius}
-                disk1Height={this.state.disk1Height}
-                blade1Count={this.state.blade1Count}
-                blade1InnerRadius={this.state.blade1InnerRadius}
-                blade1OuterRadius={this.state.blade1OuterRadius}
-                blade1Width={this.state.blade1Width}
-                blade1Height={this.state.blade1Height}
-
-                hub2Radius={this.state.hub2Radius}
-                hub2Height={this.state.hub2Height}
-                disk2Radius={this.state.disk2Radius}
-                disk2Height={this.state.disk2Height}
-                blade2Count={this.state.blade2Count}
-                blade2InnerRadius={this.state.blade2InnerRadius}
-                blade2OuterRadius={this.state.blade2OuterRadius}
-                blade2Width={this.state.blade2Width}
-                blade2Height={this.state.blade2Height}
+                impellerCount={this.state.impellerCount}
+                hubRadius={this.state.hubRadius}
+                hubHeight={this.state.hubHeight}
+                diskRadius={this.state.diskRadius}
+                diskHeight={this.state.diskHeight}
+                bladeCount={this.state.bladeCount}
+                bladeInnerRadius={this.state.bladeInnerRadius}
+                bladeOuterRadius={this.state.bladeOuterRadius}
+                bladeWidth={this.state.bladeWidth}
+                bladeHeight={this.state.bladeHeight}
 
                 transPanXY={this.state.transPanXY}
                 transPanYZ={this.state.transPanYZ}
@@ -398,208 +290,86 @@ export default class App extends Component {
                 </Menu.Item>
               </Menu.SubMenu>
 
-              <Menu.SubMenu className="subMenu" key="impeller0" title={
-                <span><Icon type={'mail'}/><span>Impeller0</span></span>
+              <Menu.SubMenu className="subMenu" key="impellers" title={
+                <span><Icon type={'mail'} /><span>Impeller Count</span></span>
               }>
-                <Menu.SubMenu className="subMenu" key="hub0" title={
-                  <span><Icon type={'mail'} /><span>Hub</span></span>
-                }>
-                  <Menu.Item key="hub0Radius">
-                    <span>Radius</span>
-                    <InputNumber size="small" min={1} defaultValue={this.state.hub0Radius} onChange={(value) => this.handleChange('hub0Radius', value)} />
-                  </Menu.Item>
-                  <Menu.Item key="hub0Height">
-                    <span>Height</span>
-                    <InputNumber size="small" min={1} defaultValue={this.state.hub0Height} onChange={(value) => this.handleChange('hub0Height', value)} />
-                  </Menu.Item>
-                </Menu.SubMenu>
-                <Menu.SubMenu className="subMenu" key="disk0" title={
-                  <span><Icon type={'mail'}/><span>Disk</span></span>
-                }>
-                  <Menu.Item key="disk0Radius">
-                    <span>Radius</span>
-                    <InputNumber size="small" min={1} defaultValue={this.state.disk0Radius} onChange={(value) => this.handleChange('disk0Radius', value)} />
-                  </Menu.Item>
-                  <Menu.Item key="disk0Height">
-                    <span>Height</span>
-                    <InputNumber size="small" min={1} defaultValue={this.state.disk0Height} onChange={(value) => this.handleChange('disk0Height', value)} />
-                  </Menu.Item>
-                </Menu.SubMenu>
-                <Menu.SubMenu className="subMenu" key="blade0" title={
-                  <span><Icon type={'mail'}/><span>Blade</span></span>
-                }>
-                  <Menu.Item key="blade0Count">
-                    <span>Count</span>
-                    <InputNumber size="small" min={1} defaultValue={this.state.blade0Count} onChange={(value) => this.handleChange('blade0Count', value)} />
-                  </Menu.Item>
-                  <Menu.Item key="blade0InnerRadius">
-                    <span>Inner Radius</span>
-                    <InputNumber size="small" min={1} defaultValue={this.state.blade0InnerRadius} onChange={(value) => this.handleChange('blade0InnerRadius', value)} />
-                  </Menu.Item>
-                  <Menu.Item key="blade0OuterRadius">
-                    <span>Outer Radius</span>
-                    <InputNumber size="small" min={1} defaultValue={this.state.blade0OuterRadius} onChange={(value) => this.handleChange('blade0OuterRadius', value)} />
-                  </Menu.Item>
-                  <Menu.Item key="blade0Width">
-                    <span>Width</span>
-                    <InputNumber size="small" min={1} defaultValue={this.state.blade0Width} onChange={(value) => this.handleChange('blade0Width', value)} />
-                  </Menu.Item>
-                  <Menu.Item key="blade0Height">
-                    <span>Height</span>
-                    <InputNumber size="small" min={1} defaultValue={this.state.blade0Height} onChange={(value) => this.handleChange('blade0Height', value)} />
-                  </Menu.Item>
-                  <Menu.Item key="blade0AutoRotate">
-                    <Checkbox checked={this.state.kernelAutoRotation} onChange={this.handleAutoRotation.bind(this)}>
-                      <span className="ant-menu-control">Auto Rotation</span>
-                    </Checkbox>
-                  </Menu.Item>
-                  <Menu.Item key="blade0Kernel">
-                    <Radio.Group onChange={this.handleRadio.bind(this)} value={this.state.kernelRotationDir}>
-                      <Radio value="clockwise">
-                        <span className="ant-menu-control">Clockwise</span>
-                      </Radio>
-                      <Radio value="counter-clockwise">
-                        <span className="ant-menu-control">Counter-Clockwise</span>
-                      </Radio>
-                    </Radio.Group>
-                  </Menu.Item>
-                </Menu.SubMenu>
+                <Menu.Item key="impellerCount">
+                  <span>Count</span>
+                  <InputNumber size="small" min={1} defaultValue={this.state.impellerCount} onChange={(value) => this.handleChange('impellerCount', value)} />
+                </Menu.Item>
               </Menu.SubMenu>
 
-              <Menu.SubMenu className="subMenu" key="impeller1" title={
-                <span><Icon type={'mail'}/><span>Impeller1</span></span>
+              <Menu.SubMenu className="subMenu" key="hub" title={
+                <span>
+                  <Icon type={this.state.hoverObject === 'hub' ? 'environment' : 'mail'} />
+                  <span style={{fontWeight: this.state.hoverObject === 'hub' ? 'bold' : 'normal'}}>Hub</span>
+                </span>
               }>
-                <Menu.SubMenu className="subMenu" key="hub1" title={
-                  <span><Icon type={'mail'} /><span>Hub</span></span>
-                }>
-                  <Menu.Item key="hub1Radius">
-                    <span>Radius</span>
-                    <InputNumber size="small" min={1} defaultValue={this.state.hub1Radius} onChange={(value) => this.handleChange('hub1Radius', value)} />
-                  </Menu.Item>
-                  <Menu.Item key="hub1Height">
-                    <span>Height</span>
-                    <InputNumber size="small" min={1} defaultValue={this.state.hub1Height} onChange={(value) => this.handleChange('hub1Height', value)} />
-                  </Menu.Item>
-                </Menu.SubMenu>
-                <Menu.SubMenu className="subMenu" key="disk1" title={
-                  <span><Icon type={'mail'}/><span>Disk</span></span>
-                }>
-                  <Menu.Item key="disk1Radius">
-                    <span>Radius</span>
-                    <InputNumber size="small" min={1} defaultValue={this.state.disk1Radius} onChange={(value) => this.handleChange('disk1Radius', value)} />
-                  </Menu.Item>
-                  <Menu.Item key="disk1Height">
-                    <span>Height</span>
-                    <InputNumber size="small" min={1} defaultValue={this.state.disk1Height} onChange={(value) => this.handleChange('disk1Height', value)} />
-                  </Menu.Item>
-                </Menu.SubMenu>
-                <Menu.SubMenu className="subMenu" key="blade1" title={
-                  <span><Icon type={'mail'}/><span>Blade</span></span>
-                }>
-                  <Menu.Item key="blade1Count">
-                    <span>Count</span>
-                    <InputNumber size="small" min={1} defaultValue={this.state.blade1Count} onChange={(value) => this.handleChange('blade1Count', value)} />
-                  </Menu.Item>
-                  <Menu.Item key="blade1InnerRadius">
-                    <span>Inner Radius</span>
-                    <InputNumber size="small" min={1} defaultValue={this.state.blade1InnerRadius} onChange={(value) => this.handleChange('blade1InnerRadius', value)} />
-                  </Menu.Item>
-                  <Menu.Item key="blade1OuterRadius">
-                    <span>Outer Radius</span>
-                    <InputNumber size="small" min={1} defaultValue={this.state.blade1OuterRadius} onChange={(value) => this.handleChange('blade1OuterRadius', value)} />
-                  </Menu.Item>
-                  <Menu.Item key="blade1Width">
-                    <span>Width</span>
-                    <InputNumber size="small" min={1} defaultValue={this.state.blade1Width} onChange={(value) => this.handleChange('blade1Width', value)} />
-                  </Menu.Item>
-                  <Menu.Item key="blade1Height">
-                    <span>Height</span>
-                    <InputNumber size="small" min={1} defaultValue={this.state.blade1Height} onChange={(value) => this.handleChange('blade1Height', value)} />
-                  </Menu.Item>
-                  <Menu.Item key="blade1AutoRotate">
-                    <Checkbox checked={this.state.kernelAutoRotation} onChange={this.handleAutoRotation.bind(this)}>
-                      <span className="ant-menu-control">Auto Rotation</span>
-                    </Checkbox>
-                  </Menu.Item>
-                  <Menu.Item key="blade1Kernel">
-                    <Radio.Group onChange={this.handleRadio.bind(this)} value={this.state.kernelRotationDir}>
-                      <Radio value="clockwise">
-                        <span className="ant-menu-control">Clockwise</span>
-                      </Radio>
-                      <Radio value="counter-clockwise">
-                        <span className="ant-menu-control">Counter-Clockwise</span>
-                      </Radio>
-                    </Radio.Group>
-                  </Menu.Item>
-                </Menu.SubMenu>
+                <Menu.Item key="hubRadius">
+                  <span>Radius</span>
+                  <InputNumber size="small" min={1} defaultValue={this.state.hubRadius} onChange={(value) => this.handleChange('hubRadius', value)} />
+                </Menu.Item>
+                <Menu.Item key="hubHeight">
+                  <span>Height</span>
+                  <InputNumber size="small" min={1} defaultValue={this.state.hubHeight} onChange={(value) => this.handleChange('hubHeight', value)} />
+                </Menu.Item>
               </Menu.SubMenu>
-
-              <Menu.SubMenu className="subMenu" key="impeller2" title={
-                <span><Icon type={'mail'}/><span>Impeller2</span></span>
+              <Menu.SubMenu className="subMenu" key="disk" title={
+                <span>
+                  <Icon type={this.state.hoverObject === 'disk' ? 'environment' : 'mail'} />
+                  <span style={{fontWeight: this.state.hoverObject === 'disk' ? 'bold' : 'normal'}}>Disk</span>
+                </span>
               }>
-                <Menu.SubMenu className="subMenu" key="hub2" title={
-                  <span><Icon type={'mail'} /><span>Hub</span></span>
-                }>
-                  <Menu.Item key="hub2Radius">
-                    <span>Radius</span>
-                    <InputNumber size="small" min={1} defaultValue={this.state.hub2Radius} onChange={(value) => this.handleChange('hub2Radius', value)} />
-                  </Menu.Item>
-                  <Menu.Item key="hub2Height">
-                    <span>Height</span>
-                    <InputNumber size="small" min={1} defaultValue={this.state.hub2Height} onChange={(value) => this.handleChange('hub2Height', value)} />
-                  </Menu.Item>
-                </Menu.SubMenu>
-                <Menu.SubMenu className="subMenu" key="disk2" title={
-                  <span><Icon type={'mail'}/><span>Disk</span></span>
-                }>
-                  <Menu.Item key="disk2Radius">
-                    <span>Radius</span>
-                    <InputNumber size="small" min={1} defaultValue={this.state.disk2Radius} onChange={(value) => this.handleChange('disk2Radius', value)} />
-                  </Menu.Item>
-                  <Menu.Item key="disk2Height">
-                    <span>Height</span>
-                    <InputNumber size="small" min={1} defaultValue={this.state.disk2Height} onChange={(value) => this.handleChange('disk2Height', value)} />
-                  </Menu.Item>
-                </Menu.SubMenu>
-                <Menu.SubMenu className="subMenu" key="blade2" title={
-                  <span><Icon type={'mail'}/><span>Blade</span></span>
-                }>
-                  <Menu.Item key="blade2Count">
-                    <span>Count</span>
-                    <InputNumber size="small" min={1} defaultValue={this.state.blade2Count} onChange={(value) => this.handleChange('blade2Count', value)} />
-                  </Menu.Item>
-                  <Menu.Item key="blade2InnerRadius">
-                    <span>Inner Radius</span>
-                    <InputNumber size="small" min={1} defaultValue={this.state.blade2InnerRadius} onChange={(value) => this.handleChange('blade2InnerRadius', value)} />
-                  </Menu.Item>
-                  <Menu.Item key="blade2OuterRadius">
-                    <span>Outer Radius</span>
-                    <InputNumber size="small" min={1} defaultValue={this.state.blade2OuterRadius} onChange={(value) => this.handleChange('blade2OuterRadius', value)} />
-                  </Menu.Item>
-                  <Menu.Item key="blade2Width">
-                    <span>Width</span>
-                    <InputNumber size="small" min={1} defaultValue={this.state.blade2Width} onChange={(value) => this.handleChange('blade2Width', value)} />
-                  </Menu.Item>
-                  <Menu.Item key="blade2Height">
-                    <span>Height</span>
-                    <InputNumber size="small" min={1} defaultValue={this.state.blade2Height} onChange={(value) => this.handleChange('blade2Height', value)} />
-                  </Menu.Item>
-                  <Menu.Item key="blade2AutoRotate">
-                    <Checkbox checked={this.state.kernelAutoRotation} onChange={this.handleAutoRotation.bind(this)}>
-                      <span className="ant-menu-control">Auto Rotation</span>
-                    </Checkbox>
-                  </Menu.Item>
-                  <Menu.Item key="blade2Kernel">
-                    <Radio.Group onChange={this.handleRadio.bind(this)} value={this.state.kernelRotationDir}>
-                      <Radio value="clockwise">
-                        <span className="ant-menu-control">Clockwise</span>
-                      </Radio>
-                      <Radio value="counter-clockwise">
-                        <span className="ant-menu-control">Counter-Clockwise</span>
-                      </Radio>
-                    </Radio.Group>
-                  </Menu.Item>
-                </Menu.SubMenu>
+                <Menu.Item key="diskRadius">
+                  <span>Radius</span>
+                  <InputNumber size="small" min={1} defaultValue={this.state.diskRadius} onChange={(value) => this.handleChange('diskRadius', value)} />
+                </Menu.Item>
+                <Menu.Item key="diskHeight">
+                  <span>Height</span>
+                  <InputNumber size="small" min={1} defaultValue={this.state.diskHeight} onChange={(value) => this.handleChange('diskHeight', value)} />
+                </Menu.Item>
+              </Menu.SubMenu>
+              <Menu.SubMenu className="subMenu" key="blade" title={
+                <span>
+                  <Icon type={this.state.hoverObject === 'blade' ? 'environment' : 'mail'} />
+                  <span style={{fontWeight: this.state.hoverObject === 'blade' ? 'bold' : 'normal'}}>Blade</span>
+                </span>
+              }>
+                <Menu.Item key="bladeCount">
+                  <span>Count</span>
+                  <InputNumber size="small" min={1} defaultValue={this.state.bladeCount} onChange={(value) => this.handleChange('bladeCount', value)} />
+                </Menu.Item>
+                <Menu.Item key="bladeInnerRadius">
+                  <span>Inner Radius</span>
+                  <InputNumber size="small" min={1} defaultValue={this.state.bladeInnerRadius} onChange={(value) => this.handleChange('bladeInnerRadius', value)} />
+                </Menu.Item>
+                <Menu.Item key="bladeOuterRadius">
+                  <span>Outer Radius</span>
+                  <InputNumber size="small" min={1} defaultValue={this.state.bladeOuterRadius} onChange={(value) => this.handleChange('bladeOuterRadius', value)} />
+                </Menu.Item>
+                <Menu.Item key="bladeWidth">
+                  <span>Width</span>
+                  <InputNumber size="small" min={1} defaultValue={this.state.bladeWidth} onChange={(value) => this.handleChange('bladeWidth', value)} />
+                </Menu.Item>
+                <Menu.Item key="bladeHeight">
+                  <span>Height</span>
+                  <InputNumber size="small" min={1} defaultValue={this.state.bladeHeight} onChange={(value) => this.handleChange('bladeHeight', value)} />
+                </Menu.Item>
+                <Menu.Item key="bladeAutoRotate">
+                  <Checkbox checked={this.state.kernelAutoRotation} onChange={this.handleAutoRotation.bind(this)}>
+                    <span className="ant-menu-control">Auto Rotation</span>
+                  </Checkbox>
+                </Menu.Item>
+                <Menu.Item key="bladeKernel">
+                  <Radio.Group onChange={this.handleRadio.bind(this)} value={this.state.kernelRotationDir}>
+                    <Radio value="clockwise">
+                      <span className="ant-menu-control">Clockwise</span>
+                    </Radio>
+                    <Radio value="counter-clockwise">
+                      <span className="ant-menu-control">Counter-Clockwise</span>
+                    </Radio>
+                  </Radio.Group>
+                </Menu.Item>
               </Menu.SubMenu>
 
               <Menu.SubMenu className="setting subMenu" key="setting" title={
