@@ -351,11 +351,11 @@ class Turbine extends Component {
     var geometry = this.createTankGeometry(this.props);
     var material = new THREE.MeshLambertMaterial({
       color: greyColor,
-      opacity: 0.2,
+      opacity: 0.3,
       transparent: true,
-      side: THREE.DoubleSide,
-      clippingPlanes: [],
-      clipShadows: true
+      side: THREE.BackSide
+      // clippingPlanes: [],
+      // clipShadows: true
     });
     this.tank = new THREE.Mesh(geometry, material);
     this.tank.name = "tank";
